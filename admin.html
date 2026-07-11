@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>P7 Media Bootcamp — Admin</title>
+<title>LP 7 Media Bootcamp — Admin</title>
 <link rel="icon" type="image/jpeg" href="logo.jpg">
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,6 +17,16 @@
   html,body{margin:0;padding:0;}
   body{font-family:'Work Sans', sans-serif; color:var(--ink); background:var(--ash); min-height:100vh;}
   .display{font-family:'Work Sans', Arial, Helvetica, sans-serif; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;}
+
+  /* ---- Brand ---- */
+  .brand-mark{display:flex; align-items:center; gap:10px;}
+  .brand-mark img{width:38px; height:38px; border-radius:50%; object-fit:cover; box-shadow:0 1px 4px rgba(0,0,0,0.18); flex:0 0 auto;}
+  .brand-mark .brand-text{text-align:left; line-height:1.3;}
+  .brand-mark .brand-text .n{font-family:'Work Sans', Arial, Helvetica, sans-serif; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; font-size:20px;}
+  .brand-mark .brand-text .s{font-size:12.5px; color:var(--ink-soft); margin-top:2px;}
+  .gate-brand{display:flex; flex-direction:column; align-items:center; gap:10px; margin-bottom:18px;}
+  .gate-brand img{width:52px; height:52px; border-radius:50%; object-fit:cover; box-shadow:0 2px 8px rgba(0,0,0,0.18);}
+  .gate-brand span{font-weight:800; font-size:12.5px; letter-spacing:0.4px; text-transform:uppercase; color:var(--ink-soft);}
 
   /* ---- Gate ---- */
   #gate{
@@ -45,14 +55,29 @@
   #dashboard{display:none; max-width:1100px; margin:0 auto; padding:28px 18px 60px;}
   #dashboard.show{display:block;}
   .dash-top{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:22px;}
-  .dash-top h1{font-size:22px; margin:0;}
-  .dash-top .sub{font-size:12.5px; color:var(--ink-soft); margin-top:2px;}
   .dash-actions{display:flex; gap:10px; flex-wrap:wrap;}
   .dash-btn{
     border:1.5px solid var(--line); background:var(--white); color:var(--ink); font-size:12.5px;
     font-weight:700; padding:9px 14px; border-radius:9px; cursor:pointer;
   }
   .dash-btn.primary{background:var(--black); color:var(--white); border-color:var(--black);}
+
+  .filter-bar{
+    display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    background:var(--white); border:1px solid var(--line); border-radius:12px;
+    padding:12px; margin-bottom:16px;
+  }
+  .filter-bar input[type="text"]{
+    flex:1 1 180px; min-width:160px; border:1.5px solid var(--line); border-radius:9px;
+    padding:9px 12px; font-size:13px; background:var(--ash); font-family:'Work Sans', sans-serif;
+  }
+  .filter-bar select{
+    flex:0 1 170px; border:1.5px solid var(--line); border-radius:9px;
+    padding:9px 12px; font-size:13px; background:var(--ash); font-family:'Work Sans', sans-serif; color:var(--ink);
+  }
+  .filter-bar input[type="text"]:focus, .filter-bar select:focus{outline:none; border-color:var(--orange); background:var(--white);}
+  .filter-bar .filter-count{font-size:12px; color:var(--ink-soft); white-space:nowrap; margin-left:auto;}
+  .filter-bar .dash-btn{flex:0 0 auto;}
 
   .stats-row{display:flex; gap:12px; flex-wrap:wrap; margin-bottom:22px;}
   .stat-card{
@@ -82,6 +107,9 @@
     .dash-top{flex-direction:column; align-items:flex-start;}
     table{font-size:12px;}
     th, td{padding:10px;}
+    .filter-bar{flex-direction:column; align-items:stretch;}
+    .filter-bar input[type="text"], .filter-bar select{flex:1 1 auto;}
+    .filter-bar .filter-count{margin-left:0; text-align:left;}
   }
 </style>
 </head>
@@ -89,6 +117,10 @@
 
 <div id="gate">
   <div class="gate-card">
+    <div class="gate-brand">
+      <img src="logo.jpg" alt="RCCG logo">
+      <span>LAPSETA · Media Department</span>
+    </div>
     <h1 class="display">Admin Access</h1>
     <p>Enter the dashboard password to view registrants.</p>
     <input type="password" id="passwordInput" placeholder="Password" autocomplete="off">
@@ -99,15 +131,34 @@
 
 <div id="dashboard">
   <div class="dash-top">
-    <div>
-      <h1 class="display">P7 Bootcamp Registrants</h1>
-      <div class="sub" id="lastUpdated">Loading…</div>
+    <div class="brand-mark">
+      <img src="logo.jpg" alt="RCCG logo">
+      <div class="brand-text">
+        <div class="n">LP 7 Bootcamp Registrants</div>
+        <div class="s" id="lastUpdated">Loading…</div>
+      </div>
     </div>
     <div class="dash-actions">
       <button class="dash-btn" id="refreshBtn">Refresh</button>
       <button class="dash-btn" id="exportBtn">Export CSV</button>
       <button class="dash-btn primary" id="logoutBtn">Log out</button>
     </div>
+  </div>
+
+  <div class="filter-bar">
+    <input type="text" id="searchInput" placeholder="Search name or email…">
+    <select id="skillFilter">
+      <option value="">All skills</option>
+      <option value="Smartphone Photography & Videography">Photography & Videography</option>
+      <option value="AI Animation & Video Editing">AI Animation & Video Editing</option>
+      <option value="Graphic Design">Graphic Design</option>
+      <option value="Web Development">Web Development</option>
+    </select>
+    <select id="zoneFilter">
+      <option value="">All zones</option>
+    </select>
+    <button class="dash-btn" id="clearFiltersBtn">Clear</button>
+    <span class="filter-count" id="filterCount"></span>
   </div>
 
   <div class="stats-row" id="statsRow"></div>
@@ -134,13 +185,18 @@
 
 <script>
   let currentPassword = '';
-  let currentRegistrants = [];
+  let allRegistrants = [];
+  let currentRegistrants = []; // currently filtered/visible set — this is what gets exported
 
   const gate = document.getElementById('gate');
   const dashboard = document.getElementById('dashboard');
   const passwordInput = document.getElementById('passwordInput');
   const gateError = document.getElementById('gateError');
   const gateSubmit = document.getElementById('gateSubmit');
+  const searchInput = document.getElementById('searchInput');
+  const skillFilter = document.getElementById('skillFilter');
+  const zoneFilter = document.getElementById('zoneFilter');
+  const filterCount = document.getElementById('filterCount');
 
   async function fetchRegistrants(password) {
     const res = await fetch('/.netlify/functions/get-registrants', {
@@ -174,6 +230,8 @@
 
     if (list.length === 0) {
       table.style.display = 'none';
+      const filtersActive = searchInput.value.trim() || skillFilter.value || zoneFilter.value;
+      empty.textContent = filtersActive ? 'No registrants match these filters.' : 'No registrations yet.';
       empty.style.display = 'block';
       return;
     }
@@ -204,13 +262,45 @@
     document.getElementById('emptyState').style.display = 'none';
     try {
       const data = await fetchRegistrants(password);
-      currentRegistrants = data.registrants || [];
-      renderStats(currentRegistrants);
-      renderTable(currentRegistrants);
+      allRegistrants = data.registrants || [];
+      populateZoneFilter(allRegistrants);
+      applyFilters();
       document.getElementById('lastUpdated').textContent = 'Updated ' + new Date().toLocaleString();
     } catch (err) {
       document.getElementById('loadingState').textContent = err.message;
     }
+  }
+
+  function populateZoneFilter(list) {
+    const zones = [...new Set(list.map(r => (r.zone || '').trim()).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b));
+    const selected = zoneFilter.value;
+    zoneFilter.innerHTML = '<option value="">All zones</option>' +
+      zones.map(z => `<option value="${escapeHtml(z)}">${escapeHtml(z)}</option>`).join('');
+    if (zones.includes(selected)) zoneFilter.value = selected;
+  }
+
+  function applyFilters() {
+    const q = searchInput.value.trim().toLowerCase();
+    const skill = skillFilter.value;
+    const zone = zoneFilter.value;
+
+    currentRegistrants = allRegistrants.filter(r => {
+      const matchesSearch = !q ||
+        (r.fullName || '').toLowerCase().includes(q) ||
+        (r.email || '').toLowerCase().includes(q);
+      const matchesSkill = !skill || r.skill === skill;
+      const matchesZone = !zone || (r.zone || '').trim() === zone;
+      return matchesSearch && matchesSkill && matchesZone;
+    });
+
+    renderStats(currentRegistrants);
+    renderTable(currentRegistrants);
+
+    const anyFilterActive = q || skill || zone;
+    filterCount.textContent = anyFilterActive
+      ? `Showing ${currentRegistrants.length} of ${allRegistrants.length}`
+      : `${allRegistrants.length} total`;
   }
 
   async function tryLogin() {
@@ -238,9 +328,24 @@
 
   document.getElementById('refreshBtn').addEventListener('click', () => loadDashboard(currentPassword));
 
+  searchInput.addEventListener('input', applyFilters);
+  skillFilter.addEventListener('change', applyFilters);
+  zoneFilter.addEventListener('change', applyFilters);
+  document.getElementById('clearFiltersBtn').addEventListener('click', () => {
+    searchInput.value = '';
+    skillFilter.value = '';
+    zoneFilter.value = '';
+    applyFilters();
+  });
+
   document.getElementById('logoutBtn').addEventListener('click', () => {
     sessionStorage.removeItem('p7AdminPassword');
     currentPassword = '';
+    allRegistrants = [];
+    currentRegistrants = [];
+    searchInput.value = '';
+    skillFilter.value = '';
+    zoneFilter.value = '';
     dashboard.classList.remove('show');
     gate.style.display = 'flex';
     passwordInput.value = '';
