@@ -4,20 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>P7 Media Bootcamp — Register</title>
+<link rel="icon" type="image/jpeg" href="logo.jpg">
+<link rel="apple-touch-icon" href="logo.jpg">
 <meta name="description" content="Free 5-day virtual media bootcamp for teenagers in Province 7 (LAPSETA). Learn smartphone photography, AI animation, graphic design, web development and media ethics. 17th–21st August. Register free.">
 
 <!-- Open Graph / WhatsApp / Facebook -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="P7 Media Bootcamp — Skill Forge Edition">
 <meta property="og:description" content="Free 5-day virtual media bootcamp for teenagers in Province 7 (LAPSETA). Learn smartphone photography, AI animation, graphic design, web development and media ethics. 17th–21st August. Register free.">
-<meta property="og:image" content="flyer.jpg">
-<meta property="og:url" content="">
+<meta property="og:image" content="https://lp7mediabootcamp.netlify.app/logo.jpg">
+<meta property="og:url" content="https://lp7mediabootcamp.netlify.app/">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="P7 Media Bootcamp — Skill Forge Edition">
 <meta name="twitter:description" content="Free 5-day virtual media bootcamp for teenagers in Province 7 (LAPSETA). Learn smartphone photography, AI animation, graphic design, web development and media ethics. 17th–21st August. Register free.">
-<meta name="twitter:image" content="flyer.jpg">
+<meta name="twitter:image" content="https://lp7mediabootcamp.netlify.app/logo.jpg">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -437,19 +439,19 @@
         <div class="step active" data-step="1">
           <div class="field">
             <label>Full name <span class="required-star">*</span></label>
-            <input type="text" id="fullName" required minlength="3" maxlength="60" pattern="[A-Za-z][A-Za-z\s'.-]{1,58}[A-Za-z]" title="Enter your full name using letters only (e.g. Ayomide Johnson)" placeholder="e.g. Ayomide Johnson">
+            <input type="text" id="fullName" required minlength="3" maxlength="60" pattern="[A-Za-z][A-Za-z\s'.\-]{1,58}[A-Za-z]" title="Enter your full name using letters only (e.g. Ayomide Johnson)" placeholder="e.g. Ayomide Johnson">
             <div class="field-error" id="fullNameError">Name must be at least three characters.</div>
           </div>
           <div class="field">
             <label>Email address <span class="required-star">*</span></label>
-            <input type="email" id="email" required maxlength="100" pattern="[A-Za-z0-9._%+-]+@gmail\.com" title="Please enter a valid Gmail address (e.g. name@gmail.com)" placeholder="yourname@gmail.com">
+            <input type="email" id="email" required maxlength="100" pattern="[A-Za-z0-9._%+\-]+@gmail\.com" title="Please enter a valid Gmail address (e.g. name@gmail.com)" placeholder="yourname@gmail.com">
             <div class="field-hint">We only accept Gmail addresses (e.g. name@gmail.com)</div>
             <div class="field-error" id="emailError">That doesn't look like a valid Gmail address.</div>
           </div>
           <div class="row2">
             <div class="field">
               <label>Zone <span class="required-star">*</span></label>
-              <input type="text" id="zone" required maxlength="20" pattern="[A-Za-z0-9\s-]{1,20}" title="Enter your zone, e.g. Zone 3" placeholder="e.g. Zone 3">
+              <input type="text" id="zone" required maxlength="20" pattern="[A-Za-z0-9\s\-]{1,20}" title="Enter your zone" placeholder="Put in your zone">
               <div class="field-error" id="zoneError">Please enter your zone.</div>
             </div>
             <div class="field">
