@@ -1,4 +1,5 @@
 const admin = require('firebase-admin');
+const { getFirestore } = require('firebase-admin/firestore');
 
 function getAdmin() {
   if (!admin.apps.length) {
@@ -10,6 +11,11 @@ function getAdmin() {
   return admin;
 }
 
+function getDb(fbAdmin) {
+  const databaseId = process.env.FIRESTORE_DATABASE_ID || '(default)';
+  return getFirestore(fbAdmin.app(), databaseId);
+}
+
 exports.handler = async function (event) {
   const suppliedPassword = event.headers['x-admin-password'] || '';
 
@@ -18,7 +24,7 @@ exports.handler = async function (event) {
   }
 
   const fbAdmin = getAdmin();
-  const db = fbAdmin.firestore();
+  const db = getDb(fbAdmin);
 
   try {
     const snapshot = await db.collection('registrations').orderBy('createdAt', 'desc').get();

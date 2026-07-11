@@ -1,4 +1,5 @@
 const admin = require('firebase-admin');
+const { getFirestore } = require('firebase-admin/firestore');
 
 // Reuse the same Firebase app across warm invocations instead of re-initializing every time
 function getAdmin() {
@@ -9,6 +10,14 @@ function getAdmin() {
     admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
   }
   return admin;
+}
+
+// If your Firestore database is Enterprise edition (or any named database other than
+// the Standard-edition default), set FIRESTORE_DATABASE_ID in Netlify to match its exact ID.
+// Leave unset if you're on a Standard edition "(default)" database.
+function getDb(fbAdmin) {
+  const databaseId = process.env.FIRESTORE_DATABASE_ID || '(default)';
+  return getFirestore(fbAdmin.app(), databaseId);
 }
 
 // Maps each of the four selectable skills to its own Brevo template ID (set these in Netlify env vars)
@@ -61,7 +70,7 @@ exports.handler = async function (event) {
   }
 
   const fbAdmin = getAdmin();
-  const db = fbAdmin.firestore();
+  const db = getDb(fbAdmin);
 
   // Save the registration first — if the email fails afterwards, the registrant still isn't lost
   let docRef;
