@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P7 Media Bootcamp — Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --black:#14100C; --orange:#F2650F; --orange-deep:#C8480A; --white:#FFFFFF;
+    --ash:#FAF9F6; --ink:#1B1710; --ink-soft:#6B6459; --line:#EDEAE2;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'Work Sans', sans-serif; color:var(--ink); background:var(--ash); min-height:100vh;}
+  .display{font-family:'Anton', sans-serif; text-transform:uppercase; letter-spacing:0.5px;}
+
+  /* ---- Gate ---- */
+  #gate{
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+  .gate-card{
+    background:var(--white); border:1px solid var(--line); border-radius:18px; padding:34px 30px;
+    max-width:360px; width:100%; box-shadow:0 24px 60px rgba(20,16,12,0.10); text-align:center;
+  }
+  .gate-card h1{font-size:22px; margin:0 0 6px;}
+  .gate-card p{font-size:13px; color:var(--ink-soft); margin:0 0 20px;}
+  .gate-card input{
+    width:100%; border:1.5px solid var(--line); border-radius:10px; padding:12px 14px;
+    font-size:14.5px; background:var(--ash); margin-bottom:12px;
+  }
+  .gate-card input:focus{outline:none; border-color:var(--orange); background:var(--white);}
+  .gate-card button{
+    width:100%; border:none; border-radius:10px; padding:13px; background:var(--orange); color:var(--white);
+    font-family:'Anton'; letter-spacing:1px; font-size:14px; text-transform:uppercase; cursor:pointer;
+  }
+  .gate-card button:disabled{opacity:0.6; cursor:not-allowed;}
+  .gate-error{color:#C8480A; font-size:12.5px; margin-top:10px; display:none;}
+  .gate-error.show{display:block;}
+
+  /* ---- Dashboard ---- */
+  #dashboard{display:none; max-width:1100px; margin:0 auto; padding:28px 18px 60px;}
+  #dashboard.show{display:block;}
+  .dash-top{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:22px;}
+  .dash-top h1{font-size:22px; margin:0;}
+  .dash-top .sub{font-size:12.5px; color:var(--ink-soft); margin-top:2px;}
+  .dash-actions{display:flex; gap:10px; flex-wrap:wrap;}
+  .dash-btn{
+    border:1.5px solid var(--line); background:var(--white); color:var(--ink); font-size:12.5px;
+    font-weight:700; padding:9px 14px; border-radius:9px; cursor:pointer;
+  }
+  .dash-btn.primary{background:var(--black); color:var(--white); border-color:var(--black);}
+
+  .stats-row{display:flex; gap:12px; flex-wrap:wrap; margin-bottom:22px;}
+  .stat-card{
+    background:var(--white); border:1px solid var(--line); border-radius:12px; padding:14px 18px; min-width:130px;
+  }
+  .stat-card .n{font-family:'Anton'; font-size:22px; color:var(--orange);}
+  .stat-card .l{font-size:11px; color:var(--ink-soft); font-weight:700; text-transform:uppercase; letter-spacing:0.4px;}
+
+  .table-wrap{background:var(--white); border:1px solid var(--line); border-radius:14px; overflow-x:auto;}
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  th{
+    text-align:left; padding:12px 14px; background:var(--ash); color:var(--ink-soft);
+    font-size:11px; text-transform:uppercase; letter-spacing:0.4px; white-space:nowrap; border-bottom:1px solid var(--line);
+  }
+  td{padding:12px 14px; border-bottom:1px solid var(--line); vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  .skill-tag{
+    display:inline-block; background:#FFF4EC; color:var(--orange-deep); font-size:11px; font-weight:700;
+    padding:3px 9px; border-radius:20px; white-space:nowrap;
+  }
+  .cell-name{font-weight:700;}
+  .cell-expect{max-width:240px; color:var(--ink-soft); font-size:12.5px;}
+  .empty-state{padding:50px 20px; text-align:center; color:var(--ink-soft); font-size:14px;}
+  .loading-state{padding:50px 20px; text-align:center; color:var(--ink-soft); font-size:14px;}
+
+  @media (max-width:640px){
+    .dash-top{flex-direction:column; align-items:flex-start;}
+    table{font-size:12px;}
+    th, td{padding:10px;}
+  }
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gate-card">
+    <h1 class="display">Admin Access</h1>
+    <p>Enter the dashboard password to view registrants.</p>
+    <input type="password" id="passwordInput" placeholder="Password" autocomplete="off">
+    <button type="button" id="gateSubmit">Enter</button>
+    <div class="gate-error" id="gateError">Incorrect password. Try again.</div>
+  </div>
+</div>
+
+<div id="dashboard">
+  <div class="dash-top">
+    <div>
+      <h1 class="display">P7 Bootcamp Registrants</h1>
+      <div class="sub" id="lastUpdated">Loading…</div>
+    </div>
+    <div class="dash-actions">
+      <button class="dash-btn" id="refreshBtn">Refresh</button>
+      <button class="dash-btn" id="exportBtn">Export CSV</button>
+      <button class="dash-btn primary" id="logoutBtn">Log out</button>
+    </div>
+  </div>
+
+  <div class="stats-row" id="statsRow"></div>
+
+  <div class="table-wrap">
+    <table id="registrantsTable" style="display:none;">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Zone</th>
+          <th>Age</th>
+          <th>Skill</th>
+          <th>Expectation</th>
+          <th>Registered</th>
+        </tr>
+      </thead>
+      <tbody id="registrantsBody"></tbody>
+    </table>
+    <div class="loading-state" id="loadingState">Loading registrants…</div>
+    <div class="empty-state" id="emptyState" style="display:none;">No registrations yet.</div>
+  </div>
+</div>
+
+<script>
+  let currentPassword = '';
+  let currentRegistrants = [];
+
+  const gate = document.getElementById('gate');
+  const dashboard = document.getElementById('dashboard');
+  const passwordInput = document.getElementById('passwordInput');
+  const gateError = document.getElementById('gateError');
+  const gateSubmit = document.getElementById('gateSubmit');
+
+  async function fetchRegistrants(password) {
+    const res = await fetch('/.netlify/functions/get-registrants', {
+      headers: { 'x-admin-password': password },
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(res.status === 401 ? 'Incorrect password.' : (err.error || 'Could not load registrants.'));
+    }
+    return res.json();
+  }
+
+  function renderStats(list) {
+    const bySkill = {};
+    list.forEach(r => { bySkill[r.skill] = (bySkill[r.skill] || 0) + 1; });
+    const statsRow = document.getElementById('statsRow');
+    statsRow.innerHTML = `
+      <div class="stat-card"><div class="n">${list.length}</div><div class="l">Total registered</div></div>
+      ${Object.entries(bySkill).map(([skill, count]) => `
+        <div class="stat-card"><div class="n">${count}</div><div class="l">${skill.split(' ')[0]}</div></div>
+      `).join('')}
+    `;
+  }
+
+  function renderTable(list) {
+    const tbody = document.getElementById('registrantsBody');
+    const table = document.getElementById('registrantsTable');
+    const empty = document.getElementById('emptyState');
+    const loading = document.getElementById('loadingState');
+    loading.style.display = 'none';
+
+    if (list.length === 0) {
+      table.style.display = 'none';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    table.style.display = 'table';
+    tbody.innerHTML = list.map(r => `
+      <tr>
+        <td class="cell-name">${escapeHtml(r.fullName)}</td>
+        <td>${escapeHtml(r.email)}</td>
+        <td>${escapeHtml(r.zone)}</td>
+        <td>${escapeHtml(String(r.age))}</td>
+        <td><span class="skill-tag">${escapeHtml(r.skill)}</span></td>
+        <td class="cell-expect">${escapeHtml(r.expectation || '—')}</td>
+        <td>${r.createdAt ? new Date(r.createdAt).toLocaleString() : '—'}</td>
+      </tr>
+    `).join('');
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  async function loadDashboard(password) {
+    document.getElementById('loadingState').style.display = 'block';
+    document.getElementById('registrantsTable').style.display = 'none';
+    document.getElementById('emptyState').style.display = 'none';
+    try {
+      const data = await fetchRegistrants(password);
+      currentRegistrants = data.registrants || [];
+      renderStats(currentRegistrants);
+      renderTable(currentRegistrants);
+      document.getElementById('lastUpdated').textContent = 'Updated ' + new Date().toLocaleString();
+    } catch (err) {
+      document.getElementById('loadingState').textContent = err.message;
+    }
+  }
+
+  async function tryLogin() {
+    const password = passwordInput.value;
+    if (!password) return;
+    gateSubmit.disabled = true;
+    gateError.classList.remove('show');
+    try {
+      await fetchRegistrants(password); // validates the password before switching views
+      currentPassword = password;
+      sessionStorage.setItem('p7AdminPassword', password); // stays only for this browser tab session
+      gate.style.display = 'none';
+      dashboard.classList.add('show');
+      loadDashboard(currentPassword);
+    } catch (err) {
+      gateError.textContent = err.message;
+      gateError.classList.add('show');
+    } finally {
+      gateSubmit.disabled = false;
+    }
+  }
+
+  gateSubmit.addEventListener('click', tryLogin);
+  passwordInput.addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
+
+  document.getElementById('refreshBtn').addEventListener('click', () => loadDashboard(currentPassword));
+
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    sessionStorage.removeItem('p7AdminPassword');
+    currentPassword = '';
+    dashboard.classList.remove('show');
+    gate.style.display = 'flex';
+    passwordInput.value = '';
+    passwordInput.focus();
+  });
+
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    if (!currentRegistrants.length) return;
+    const headers = ['Full Name', 'Email', 'Zone', 'Age', 'Skill', 'Expectation', 'Registered'];
+    const rows = currentRegistrants.map(r => [
+      r.fullName, r.email, r.zone, r.age, r.skill,
+      (r.expectation || '').replace(/"/g, '""'),
+      r.createdAt ? new Date(r.createdAt).toLocaleString() : '',
+    ]);
+    const csv = [headers, ...rows]
+      .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'p7-media-bootcamp-registrants.csv';
+    link.click();
+  });
+
+  // Re-check a session password on every page view, so the dashboard fetches fresh data
+  // each time it's opened rather than staying stuck on stale state.
+  window.addEventListener('DOMContentLoaded', () => {
+    const saved = sessionStorage.getItem('p7AdminPassword');
+    if (saved) {
+      passwordInput.value = saved;
+      tryLogin();
+    }
+  });
+</script>
+
+</body>
+</html>

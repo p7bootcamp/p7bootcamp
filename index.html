@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P7 Media Bootcamp — Register</title>
+<meta name="description" content="Free 5-day virtual media bootcamp for teenagers in Province 7 (LAPSETA). Learn smartphone photography, AI animation, graphic design, web development and media ethics. 17th–21st August. Register free.">
+
+<!-- Open Graph / WhatsApp / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="P7 Media Bootcamp — Skill Forge Edition">
+<meta property="og:description" content="Free 5-day virtual media bootcamp for teenagers in Province 7 (LAPSETA). Learn smartphone photography, AI animation, graphic design, web development and media ethics. 17th–21st August. Register free.">
+<meta property="og:image" content="flyer.jpg">
+<meta property="og:url" content="">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="P7 Media Bootcamp — Skill Forge Edition">
+<meta name="twitter:description" content="Free 5-day virtual media bootcamp for teenagers in Province 7 (LAPSETA). Learn smartphone photography, AI animation, graphic design, web development and media ethics. 17th–21st August. Register free.">
+<meta name="twitter:image" content="flyer.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --black:#14100C;
+    --orange:#F2650F;
+    --orange-deep:#C8480A;
+    --white:#FFFFFF;
+    --ash:#FAF9F6;
+    --blue:#2E8FE0;
+    --gold:#FFC53D;
+    --ink:#1B1710;
+    --ink-soft:#6B6459;
+    --line:#EDEAE2;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Work Sans', sans-serif;
+    color:var(--ink);
+    background:var(--white);
+    min-height:100vh;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  .display{font-family:'Anton', sans-serif; text-transform:uppercase; letter-spacing:0.5px;}
+  a{color:inherit;}
+
+  .deco{position:absolute; pointer-events:none; z-index:0;}
+  .deco-jagged{
+    background:var(--blue);
+    clip-path:polygon(50% 0%,61% 22%,86% 8%,78% 33%,100% 40%,76% 52%,92% 72%,63% 63%,58% 90%,45% 66%,20% 82%,30% 55%,4% 50%,28% 38%,10% 12%,38% 26%);
+  }
+
+  /* ---------- NAV ---------- */
+  nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 32px; max-width:1040px; margin:0 auto;
+    position:relative; z-index:2;
+  }
+  nav .brand{display:flex; align-items:center; gap:10px;}
+  nav .brand img{width:30px; height:30px;}
+  nav .brand span{font-weight:800; font-size:13.5px; letter-spacing:0.2px; white-space:nowrap;}
+  nav .brand .pipe{color:var(--orange); font-weight:400; margin:0 1px;}
+  nav .navlink{
+    font-size:13px; font-weight:700; background:var(--black); color:var(--white);
+    padding:9px 18px; border-radius:8px; text-decoration:none;
+    border:none; font-family:'Work Sans', sans-serif; cursor:pointer;
+  }
+
+  /* ---------- HERO (flyer-style textured) ---------- */
+  .hero{
+    position:relative; padding:54px 16px 60px; overflow:hidden;
+    background:
+      repeating-linear-gradient(45deg, rgba(0,0,0,0.14) 0 2px, transparent 2px 24px),
+      repeating-linear-gradient(-45deg, rgba(0,0,0,0.14) 0 2px, transparent 2px 24px),
+      linear-gradient(160deg, var(--orange) 0%, var(--orange-deep) 100%);
+  }
+  .hero-tear{
+    position:absolute; top:-30px; left:-40px; width:190px; height:190px; z-index:0;
+    background:repeating-linear-gradient(45deg, rgba(0,0,0,0.16) 0 2px, transparent 2px 24px);
+    clip-path:polygon(0 0,100% 0,80% 40%,100% 55%,70% 70%,85% 100%,0 100%);
+    opacity:0.85;
+  }
+  .hero-ring{position:absolute; top:-26px; right:-26px; width:110px; height:110px; border:12px solid rgba(0,0,0,0.16); border-radius:50%; z-index:0;}
+  .hero-inner{
+    position:relative; z-index:1; max-width:600px; margin:0 auto;
+    background:var(--ash);
+    background-image:repeating-linear-gradient(45deg, rgba(20,16,12,0.045) 0 2px, transparent 2px 22px),
+                      repeating-linear-gradient(-45deg, rgba(20,16,12,0.045) 0 2px, transparent 2px 22px);
+    border-radius:22px; padding:32px 28px 30px; text-align:center;
+    box-shadow:0 24px 60px rgba(20,16,12,0.35);
+  }
+  .hero-inner .row-top{display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:14px;}
+  .hero-inner .row-top img{width:26px; height:26px;}
+  .hero-inner .row-top span{font-size:12.5px; font-weight:800; letter-spacing:1px; color:var(--ink-soft); text-transform:uppercase;}
+  .deco-jagged.hero-burst{width:64px; height:64px; top:8%; right:6%; z-index:1;}
+  .hero-tag{
+    display:inline-flex; align-items:center; gap:7px; background:var(--ash);
+    border:1px solid var(--line); color:var(--orange-deep); font-size:11.5px; font-weight:800;
+    letter-spacing:1.5px; padding:7px 14px; border-radius:20px; text-transform:uppercase;
+  }
+  .hero-tag::before{content:''; width:6px; height:6px; border-radius:50%; background:var(--orange);}
+  .headline{font-size:52px; line-height:0.98; margin:18px 0 4px; color:var(--black);}
+  .headline span{color:var(--orange);}
+  .subline{
+    display:inline-block; margin-top:10px; background:var(--gold); color:var(--black);
+    font-size:11px; font-weight:800; letter-spacing:1.5px; padding:5px 13px;
+    border-radius:20px; text-transform:uppercase;
+  }
+  .hero-sub{color:var(--ink-soft); font-size:15.5px; margin-top:16px; line-height:1.6;}
+  .hero-divider{
+    width:44px; height:3px; border-radius:3px; margin:20px auto 0;
+    background:linear-gradient(90deg, var(--orange), var(--gold));
+  }
+  .hero-facts{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    flex-wrap:wrap; margin-top:18px;
+  }
+  .hero-facts .fact{
+    display:inline-flex; align-items:center; gap:5px; background:var(--white);
+    border:1px solid var(--line); color:var(--ink); font-size:11.5px; font-weight:700;
+    padding:6px 11px; border-radius:20px; letter-spacing:0.2px;
+  }
+  .hero-facts .fact svg{width:12px; height:12px; color:var(--orange-deep); flex:0 0 auto;}
+  .hero .cta-link{
+    display:inline-flex; align-items:center; gap:8px; margin-top:24px; background:var(--orange); color:var(--white);
+    font-family:'Anton'; letter-spacing:1px; font-size:15px; text-transform:uppercase;
+    padding:14px 34px; border-radius:10px; text-decoration:none;
+    box-shadow:0 10px 24px rgba(242,101,15,0.28);
+    border:none; cursor:pointer; transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+  }
+  .hero .cta-link:hover{background:var(--orange-deep); transform:translateY(-2px); box-shadow:0 14px 30px rgba(242,101,15,0.36);}
+  .hero .cta-link:active{transform:translateY(0) scale(0.98);}
+  .hero .cta-link svg{width:15px; height:15px;}
+  .hero-see-more{
+    display:block; margin:14px auto 0; font-size:12px; font-weight:700; color:var(--ink-soft);
+    text-decoration:none; letter-spacing:0.3px; width:fit-content;
+    border-bottom:1px dashed var(--line); padding-bottom:2px; transition:color .15s;
+  }
+  .hero-see-more:hover{color:var(--orange-deep); border-color:var(--orange-deep);}
+  .deco-jagged.j1{width:70px; height:70px; top:36px; right:6%; opacity:0.9;}
+
+  /* ---------- ABOUT ---------- */
+  .about{position:relative; padding:60px 20px 10px; background:var(--ash); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+  .about-inner{max-width:780px; margin:0 auto; position:relative; z-index:1;}
+  .section-tag{font-size:11.5px; font-weight:800; letter-spacing:2px; color:var(--orange); text-transform:uppercase; margin-bottom:8px;}
+  .about h2{font-size:28px; margin:0 0 16px; color:var(--black);}
+  .about p.body-copy{font-size:15px; line-height:1.75; color:var(--ink-soft); max-width:620px;}
+
+  .goal-grid{display:grid; grid-template-columns:1fr 1fr; gap:1px; margin-top:30px; background:var(--line); border:1px solid var(--line);}
+  .goal-card{background:var(--white); padding:20px 20px 18px;}
+  .goal-card .num{font-family:'Anton'; font-size:12px; color:var(--orange); letter-spacing:1px;}
+  .goal-card p{font-size:13.5px; color:var(--ink); font-weight:600; margin:6px 0 0; line-height:1.4;}
+
+  .stat-strip{display:flex; flex-wrap:wrap; margin-top:36px;}
+  .stat{flex:1; min-width:130px; padding:18px 10px; text-align:center;}
+  .stat .display{font-size:22px; color:var(--orange);}
+  .stat .lbl{font-size:11px; color:var(--ink-soft); font-weight:600; letter-spacing:0.5px; margin-top:2px;}
+
+  .skills-list{margin-top:44px; padding-bottom:12px;}
+  .skills-list h3{font-size:19px; margin-bottom:14px; color:var(--black);}
+  .skill-row{display:flex; align-items:flex-start; gap:14px; padding:14px 0; border-bottom:1px solid var(--line);}
+  .skill-row:last-child{border-bottom:none;}
+  .skill-row .chip{
+    flex:0 0 auto; width:32px; height:32px; border-radius:9px; background:var(--white);
+    border:1.5px solid var(--line); color:var(--orange-deep); font-family:'Anton'; font-size:12px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .skill-row .t{font-size:14px; font-weight:700; color:var(--black);}
+  .skill-row .d{font-size:12.5px; color:var(--ink-soft); margin-top:2px;}
+
+  .delivery{margin-top:12px; padding:28px 0 46px; border-top:1px solid var(--line);}
+  .delivery h3{font-size:19px; margin-bottom:12px; color:var(--black);}
+  .delivery p{font-size:14px; color:var(--ink-soft); line-height:1.7;}
+  .delivery ul{margin:12px 0 0; padding-left:18px; color:var(--ink-soft); font-size:13.5px; line-height:1.9;}
+  .delivery b{color:var(--ink);}
+
+  /* ---------- FORM DRAWER (slide-in) ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; z-index:80; display:none;
+    background:rgba(20,16,12,0.5);
+    opacity:0; transition:opacity .28s ease;
+  }
+  .modal-overlay.open{display:block;}
+  .modal-overlay.show{opacity:1;}
+  body.modal-open{overflow:hidden;}
+  .card{
+    position:fixed; top:0; right:0; z-index:1; height:100%; width:100%; max-width:440px;
+    background:var(--white); box-shadow:-20px 0 50px rgba(0,0,0,0.25);
+    overflow-y:auto; border-left:1px solid var(--line);
+    transform:translateX(100%); transition:transform .32s cubic-bezier(.32,.72,0,1);
+  }
+  .modal-overlay.show .card{transform:translateX(0);}
+  .modal-close{
+    position:absolute; top:16px; right:16px; z-index:2; width:32px; height:32px;
+    border-radius:50%; background:var(--ash); border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .modal-close svg{width:16px; height:16px; color:var(--ink);}
+  .card-top{padding:30px 32px 6px; text-align:center;}
+  .card-top h2{font-size:24px; margin:0 0 6px; color:var(--black);}
+  .card-top .sub{font-size:13px; color:var(--ink-soft);}
+
+  .stepper{display:flex; align-items:center; justify-content:center; gap:0; padding:22px 32px 0;}
+  .stepper .node{
+    width:30px; height:30px; border-radius:50%; background:var(--ash); border:1.5px solid var(--line);
+    color:var(--ink-soft); font-weight:800; font-size:13px; display:flex; align-items:center;
+    justify-content:center; flex:0 0 auto; transition:background .2s, color .2s, border-color .2s;
+  }
+  .stepper .node.active{background:var(--orange); border-color:var(--orange); color:var(--white);}
+  .stepper .node.done{background:var(--black); border-color:var(--black); color:var(--white);}
+  .stepper .line{flex:0 0 44px; height:2px; background:var(--line); margin:0 6px; position:relative;}
+  .stepper .line::after{
+    content:''; position:absolute; inset:0; background:var(--orange); transform:scaleX(0);
+    transform-origin:left; transition:transform .25s ease;
+  }
+  .stepper .line.filled::after{transform:scaleX(1);}
+  .step-label{text-align:center; font-size:11px; font-weight:700; letter-spacing:1px; color:var(--ink-soft); text-transform:uppercase; margin-top:10px;}
+
+  .card-body{padding:22px 32px 34px;}
+
+  .step{display:none; flex-direction:column; gap:16px;}
+  .step.active{display:flex;}
+
+  .field label{display:block; font-size:12.5px; font-weight:700; color:var(--ink); margin-bottom:6px; letter-spacing:0.3px;}
+  .field-hint{font-size:11px; color:var(--ink-soft); margin-top:5px;}
+  .field-counter{font-size:11px; color:var(--ink-soft); text-align:right; margin-top:4px;}
+  .field-counter.warn{color:var(--orange-deep); font-weight:700;}
+  .field-error{font-size:11.5px; color:#C8480A; margin-top:5px; display:none;}
+  .field-error.show{display:block;}
+  .field .optional{font-weight:500; color:var(--ink-soft); text-transform:none; letter-spacing:0;}
+  .field input[type=text], .field input[type=email], .field input[type=number], .field textarea{
+    width:100%; border:1.5px solid var(--line); border-radius:10px; padding:12px 14px;
+    font-family:'Work Sans'; font-size:14.5px; color:var(--ink); background:var(--ash);
+    transition:border-color .15s, background .15s;
+  }
+  .field input:focus, .field textarea:focus{outline:none; border-color:var(--orange); background:var(--white);}
+  .field input.invalid, .field textarea.invalid{border-color:#C8480A; background:#FFF4F0;}
+  .field input.valid, .field textarea.valid{border-color:#3EA25B;}
+  .field textarea{resize:vertical; min-height:70px;}
+
+  .row2{display:flex; gap:14px;}
+  .row2 .field{flex:1;}
+
+  .skills{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .skill-card{
+    position:relative; border:1.5px solid var(--line); border-radius:12px; padding:12px 14px;
+    cursor:pointer; font-size:13px; font-weight:600; line-height:1.3;
+    display:flex; align-items:flex-start; gap:10px; min-height:56px;
+    user-select:none; transition:border-color .15s, background .15s;
+  }
+  .skill-card input{position:absolute; opacity:0; width:0; height:0;}
+  .skill-card .mark{width:16px; height:16px; flex:0 0 16px; margin-top:1px; border-radius:5px; border:1.5px solid var(--ink-soft); position:relative;}
+  .skill-card input:checked ~ .mark,
+  .skill-card.selected .mark{background:var(--orange); border-color:var(--orange);}
+  .skill-card input:checked ~ .mark::after,
+  .skill-card.selected .mark::after{
+    content:''; position:absolute; left:3px; top:0px; width:5px; height:9px;
+    border:solid white; border-width:0 2px 2px 0; transform:rotate(45deg);
+  }
+  .skill-card:has(input:checked),
+  .skill-card.selected{border-color:var(--orange); background:#FFF4EC;}
+
+  .required-star{color:var(--orange);}
+
+  .btn-row{display:flex; gap:10px; margin-top:6px;}
+  .btn{
+    border:none; border-radius:10px; padding:14px; font-family:'Anton'; letter-spacing:1px;
+    font-size:15px; text-transform:uppercase; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:8px; flex:1;
+    transition:opacity .15s, transform .1s;
+  }
+  .btn:active{transform:scale(0.98);}
+  .btn:disabled{opacity:0.6; cursor:not-allowed; transform:none;}
+  .btn-primary{background:var(--orange); color:var(--white);}
+  .btn-primary:hover{background:var(--orange-deep);}
+  .btn-ghost{background:var(--ash); color:var(--ink); border:1.5px solid var(--line); flex:0 0 90px;}
+  .btn svg{width:16px; height:16px;}
+
+  .fineprint{text-align:center; font-size:11px; color:var(--ink-soft); margin-top:14px;}
+
+  .success{display:none; padding:44px 32px 40px; text-align:center;}
+  .success.show{display:block;}
+  .check{width:64px; height:64px; margin:0 auto 18px; border-radius:50%; background:var(--orange); display:flex; align-items:center; justify-content:center;}
+  .check svg{width:30px; height:30px;}
+  .success h2{font-size:24px; margin:0 0 10px; color:var(--black);}
+  .success p{color:var(--ink-soft); font-size:14px; line-height:1.6; max-width:360px; margin:0 auto 6px;}
+  .success .name{color:var(--orange); font-weight:800;}
+  .success .next{margin-top:20px; text-align:left; background:var(--ash); border:1px solid var(--line); border-radius:12px; padding:16px 18px; font-size:12.5px; color:var(--ink-soft);}
+  .success .next b{color:var(--ink); display:block; margin-bottom:6px; font-size:11.5px; letter-spacing:0.5px;}
+
+  /* ---------- FOOTER ---------- */
+  footer{background:var(--black); color:rgba(255,255,255,0.7); padding:36px 20px 22px;}
+  .footer-inner{max-width:820px; margin:0 auto;}
+  .footer-top{display:flex; justify-content:space-between; align-items:flex-start; gap:24px; flex-wrap:wrap; padding-bottom:22px; border-bottom:1px solid rgba(255,255,255,0.12);}
+  .footer-brand{display:flex; align-items:center; gap:12px;}
+  .footer-brand img{width:32px; height:32px;}
+  .footer-brand .n{color:var(--white); font-weight:800; font-size:14px;}
+  .footer-brand .n .pipe{color:var(--orange); font-weight:400; margin:0 2px;}
+  .footer-brand .s{font-size:11.5px; color:rgba(255,255,255,0.5);}
+  .footer-links{display:flex; align-items:center; gap:20px; flex-wrap:wrap; font-size:12.5px;}
+  .footer-links a{text-decoration:none; color:rgba(255,255,255,0.7);}
+  .footer-links .footer-textlink{font-weight:600;}
+  .social-icons{display:flex; gap:10px;}
+  .social-icon{
+    width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.16); display:flex; align-items:center; justify-content:center;
+    transition:background .15s, border-color .15s;
+  }
+  .social-icon svg{width:16px; height:16px;}
+  .social-icon:hover{background:var(--orange); border-color:var(--orange);}
+  .footer-bottom{padding-top:16px; font-size:11.5px; color:rgba(255,255,255,0.4); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;}
+
+  @media (max-width:600px){
+    .headline{font-size:36px;}
+    .about h2{font-size:24px;}
+    .goal-grid{grid-template-columns:1fr;}
+    .card-body{padding:20px 22px 28px;}
+    .card-top{padding:26px 22px 4px;}
+    .row2{flex-direction:column;}
+    .skills{grid-template-columns:1fr;}
+    .stat-strip{flex-wrap:wrap;}
+    .stat{flex:1 1 45%;}
+    .footer-top{flex-direction:column;}
+    nav{padding:16px 20px;}
+    nav .brand span{font-size:12px;}
+  }
+
+  :focus-visible{outline:3px solid var(--blue); outline-offset:2px;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">
+    <img src="logo.jpg" alt="RCCG logo">
+    <span>LAPSETA <span class="pipe">|</span> Media Department</span>
+  </div>
+  <button type="button" class="navlink" onclick="openModal()">Register</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="deco deco-jagged j1"></div>
+  <div class="hero-tear"></div>
+  <div class="hero-ring"></div>
+  <div class="deco deco-jagged hero-burst"></div>
+  <div class="hero-inner">
+    <div class="row-top">
+      <img src="logo.jpg" alt="RCCG logo">
+      <span>LAPSETA · Virtual Event</span>
+    </div>
+    <h1 class="headline display"><span>P7</span> Media<br>Bootcamp</h1>
+    <span class="subline">Skill Forge Edition</span>
+    <div class="hero-divider"></div>
+    <p class="hero-sub">17th – 21st August · A free virtual training week for teenagers in Province 7</p>
+    <div class="hero-facts">
+      <span class="fact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>5 Days</span>
+      <span class="fact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Free</span>
+      <span class="fact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Virtual</span>
+      <span class="fact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>200 Spots</span>
+    </div>
+    <button type="button" class="cta-link" onclick="openModal()">
+      Register now
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </button>
+    <a href="#skills-anchor" class="hero-see-more">See what you'll learn ↓</a>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about">
+  <div class="about-inner">
+    <div class="section-tag">About the program</div>
+    <h2 class="display">Why we're doing this</h2>
+    <p class="body-copy">Media and digital skills have become some of the most valuable things a young person can carry — for their own growth, and for how they serve in the work of God. A lot of teenagers in Province 7 already have the interest, they just haven't had structured guidance, mentorship or training. P7 Media Bootcamp is our first step toward closing that gap: five practical days that turn interest into real, usable skill.</p>
+
+    <div class="goal-grid">
+      <div class="goal-card"><div class="num">01</div><p>Build practical media skills in teenagers across Province 7</p></div>
+      <div class="goal-card"><div class="num">02</div><p>Raise a new generation of skilled, responsible young leaders</p></div>
+      <div class="goal-card"><div class="num">03</div><p>Create a real path to mentorship, growth and productivity</p></div>
+      <div class="goal-card"><div class="num">04</div><p>Open a pipeline into the Province 7 Media Department</p></div>
+    </div>
+
+    <div class="stat-strip">
+      <div class="stat"><div class="display">5 days</div><div class="lbl">17TH – 21ST AUG</div></div>
+      <div class="stat"><div class="display">Free</div><div class="lbl">NO COST TO ATTEND</div></div>
+      <div class="stat"><div class="display">200</div><div class="lbl">SPOTS AVAILABLE</div></div>
+      <div class="stat"><div class="display">Virtual</div><div class="lbl">SMARTPHONE-BASED</div></div>
+    </div>
+
+    <div class="skills-list" id="skills-anchor">
+      <h3>What you'll learn</h3>
+      <div class="skill-row"><div class="chip">Ph</div><div><div class="t">Smartphone Photography & Videography</div><div class="d">Phone-based shooting, framing and lighting.</div></div></div>
+      <div class="skill-row"><div class="chip">AI</div><div><div class="t">AI Animation & Video Editing</div><div class="d">Intro AI tools for motion content, plus a mobile CapCut workflow.</div></div></div>
+      <div class="skill-row"><div class="chip">GD</div><div><div class="t">Graphic Design</div><div class="d">Flyers, posters and event designs.</div></div></div>
+      <div class="skill-row"><div class="chip">WD</div><div><div class="t">Web Development</div><div class="d">HTML, CSS and JavaScript basics, plus UI/UX.</div></div></div>
+      <div class="skill-row"><div class="chip">ME</div><div><div class="t">Media Ethics & Discipline</div><div class="d">Christian conduct, teamwork and responsibility — woven through every session.</div></div></div>
+    </div>
+
+    <div class="delivery">
+      <h3>How it runs</h3>
+      <p>Everything happens virtually, so all you need is a smartphone, internet access and a willingness to show up.</p>
+      <ul>
+        <li><b>YouTube</b> — training videos and learning resources</li>
+        <li><b>WhatsApp</b> — daily explanations, discussions, assignments and feedback</li>
+        <li><b>Telegram</b> — submitting and comparing projects, plus PDFs and notes</li>
+      </ul>
+      <p style="margin-top:14px;">Trainees who show strong commitment and excellence may go on to mentorship and recruitment into the Province 7 Media Department as active members.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FORM MODAL -->
+<div class="modal-overlay" id="registerModal">
+  <div class="card">
+    <button type="button" class="modal-close" onclick="closeModal()" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div class="card-top">
+      <h2 class="display">Reserve your spot</h2>
+      <div class="sub">Takes less than a minute · Completely free</div>
+    </div>
+
+    <div class="stepper" id="stepperNodes">
+      <div class="node active" data-step="1">1</div>
+      <div class="line" data-line="1"></div>
+      <div class="node" data-step="2">2</div>
+    </div>
+    <div class="step-label" id="stepLabel">Step 1 of 2 — Your details</div>
+
+    <div class="card-body" id="formPanel">
+      <form id="regForm">
+
+        <div class="step active" data-step="1">
+          <div class="field">
+            <label>Full name <span class="required-star">*</span></label>
+            <input type="text" id="fullName" required minlength="3" maxlength="60" pattern="[A-Za-z][A-Za-z\s'.-]{1,58}[A-Za-z]" title="Enter your full name using letters only (e.g. Ayomide Johnson)" placeholder="e.g. Ayomide Johnson">
+            <div class="field-error" id="fullNameError">Name must be at least three characters.</div>
+          </div>
+          <div class="field">
+            <label>Email address <span class="required-star">*</span></label>
+            <input type="email" id="email" required maxlength="100" pattern="[A-Za-z0-9._%+-]+@gmail\.com" title="Please enter a valid Gmail address (e.g. name@gmail.com)" placeholder="yourname@gmail.com">
+            <div class="field-hint">We only accept Gmail addresses (e.g. name@gmail.com)</div>
+            <div class="field-error" id="emailError">That doesn't look like a valid Gmail address.</div>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label>Zone <span class="required-star">*</span></label>
+              <input type="text" id="zone" required maxlength="20" pattern="[A-Za-z0-9\s-]{1,20}" title="Enter your zone, e.g. Zone 3" placeholder="e.g. Zone 3">
+              <div class="field-error" id="zoneError">Please enter your zone.</div>
+            </div>
+            <div class="field">
+              <label>Age <span class="required-star">*</span></label>
+              <input type="number" id="age" required min="10" max="25" placeholder="Put in your age">
+              <div class="field-error" id="ageError">Age must be between 10 and 25.</div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button type="button" class="btn btn-primary" id="toStep2">
+              Continue
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="step" data-step="2">
+          <div class="field">
+            <label>Which skill do you want to learn? <span class="required-star">*</span></label>
+            <div class="skills">
+              <label class="skill-card">
+                <input type="radio" name="skill" value="Smartphone Photography & Videography" required>
+                <span class="mark"></span> Photography &amp; Videography
+              </label>
+              <label class="skill-card">
+                <input type="radio" name="skill" value="AI Animation & Video Editing" required>
+                <span class="mark"></span> AI Animation &amp; Video Editing
+              </label>
+              <label class="skill-card">
+                <input type="radio" name="skill" value="Graphic Design" required>
+                <span class="mark"></span> Graphic Design
+              </label>
+              <label class="skill-card">
+                <input type="radio" name="skill" value="Web Development" required>
+                <span class="mark"></span> Web Development
+              </label>
+            </div>
+          </div>
+          <div class="field">
+            <label>What do you hope to get from this bootcamp? <span class="optional">(optional, max 280 characters)</span></label>
+            <textarea id="expect" maxlength="280" placeholder="Tell us what you're hoping to learn or achieve..."></textarea>
+            <div class="field-counter" id="expectCounter">0 / 280 characters</div>
+            <div class="field-error" id="expectError">Please write a real sentence, not one long word or repeated characters.</div>
+          </div>
+          <div class="field-error" id="submitError">Something went wrong. Please try again.</div>
+          <div class="btn-row">
+            <button type="button" class="btn btn-ghost" id="toStep1">Back</button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+              <span id="submitBtnText">Register</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg>
+            </button>
+          </div>
+        </div>
+
+      </form>
+      <p class="fineprint">Limited to 200 teenagers · Province 7 only for this first edition</p>
+    </div>
+
+    <div class="success" id="successPanel">
+      <div class="check">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+      </div>
+      <h2 class="display">You're in!</h2>
+      <p>Thanks for registering, <span class="name" id="successName">friend</span>. We've saved your spot for the P7 Media Bootcamp.</p>
+      <div class="next">
+        <b>WHAT HAPPENS NEXT</b>
+        A confirmation email is on its way to your inbox. Watch out for a WhatsApp/Telegram invite from the Province 7 Media Team closer to the 17th of August, with your class schedule and joining instructions.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img src="logo.jpg" alt="RCCG logo">
+        <div>
+          <div class="n">LAPSETA <span class="pipe">|</span> Media Department</div>
+          <div class="s">Lagos Province Seven Teens Affairs</div>
+        </div>
+      </div>
+      <div class="footer-links">
+        <a href="#" onclick="openModal(); return false;" class="footer-textlink">Register</a>
+        <div class="social-icons">
+          <a href="https://whatsapp.com/channel/0029Vb6o8JiADTODuIXY4Q15" target="_blank" rel="noopener" aria-label="WhatsApp channel" class="social-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.29-.15-1.7-.84-1.97-.93-.26-.1-.46-.15-.65.14-.2.3-.75.94-.92 1.13-.17.2-.34.22-.63.08-.3-.15-1.24-.46-2.36-1.46-.87-.78-1.46-1.74-1.63-2.03-.17-.3-.02-.46.13-.6.13-.13.3-.34.44-.51.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.51-.08-.15-.65-1.58-.9-2.16-.24-.58-.48-.5-.65-.5-.17 0-.37-.02-.56-.02s-.51.08-.78.37c-.26.3-1.02 1-1.02 2.42 0 1.43 1.05 2.82 1.19 3.01.15.2 2.06 3.14 5 4.4.7.3 1.24.48 1.67.62.7.22 1.34.19 1.84.12.56-.08 1.7-.7 1.94-1.36.24-.67.24-1.24.17-1.36-.07-.12-.26-.2-.55-.34z"/><path d="M20.52 3.45A11.86 11.86 0 0 0 12.02 0C5.5 0 .2 5.28.2 11.78c0 2.08.55 4.1 1.58 5.9L0 24l6.5-1.7a11.8 11.8 0 0 0 5.5 1.4h.01c6.51 0 11.8-5.28 11.8-11.78 0-3.15-1.22-6.1-3.4-8.32zM12.02 21.6h-.01a9.8 9.8 0 0 1-5-1.36l-.36-.21-3.86 1 1.03-3.76-.24-.39a9.8 9.8 0 0 1-1.5-5.2c0-5.42 4.42-9.83 9.85-9.83 2.63 0 5.1 1.03 6.96 2.88a9.75 9.75 0 0 1 2.88 6.95c0 5.42-4.42 9.92-9.85 9.92z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/lp7teensaffairs?igsh=MXQ0dDIwa25zYmJpOQ==" target="_blank" rel="noopener" aria-label="Instagram" class="social-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="2.5" width="19" height="19" rx="5"/><circle cx="12" cy="12" r="4.3"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Province 7 Media Department. All rights reserved.</span>
+      <span>Powered by LP7 Media Department</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function openModal(){
+    const overlay = document.getElementById('registerModal');
+    overlay.classList.add('open');
+    document.body.classList.add('modal-open');
+    requestAnimationFrame(() => requestAnimationFrame(() => overlay.classList.add('show')));
+  }
+  function closeModal(){
+    const overlay = document.getElementById('registerModal');
+    overlay.classList.remove('show');
+    document.body.classList.remove('modal-open');
+    setTimeout(() => overlay.classList.remove('open'), 320);
+  }
+  document.getElementById('registerModal').addEventListener('click', function(e){
+    if (e.target === this) closeModal();
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') closeModal();
+  });
+
+  const expectField = document.getElementById('expect');
+  const expectCounter = document.getElementById('expectCounter');
+  const expectError = document.getElementById('expectError');
+  const MAX_CHARS = 280;
+
+  function isGibberish(text){
+    const trimmed = text.trim();
+    if (trimmed === '') return false;
+    // a single unbroken "word" longer than 18 characters with no spaces
+    if (!/\s/.test(trimmed) && trimmed.length > 18) return true;
+    // the same character repeated 5+ times in a row (e.g. "aaaaaaa", "!!!!!!!")
+    if (/(.)\1{4,}/.test(trimmed)) return true;
+    return false;
+  }
+
+  expectField.addEventListener('input', function(){
+    const len = this.value.length;
+    expectCounter.textContent = len + ' / ' + MAX_CHARS + ' characters';
+    expectCounter.classList.toggle('warn', len >= MAX_CHARS - 20);
+    if (!isGibberish(this.value)) expectError.classList.remove('show');
+  });
+
+  const step1 = document.querySelector('.step[data-step="1"]');
+  const step2 = document.querySelector('.step[data-step="2"]');
+
+  // Live validation for step 1 fields: mark invalid/valid as the user types or leaves a field
+  const step1FieldIds = ['fullName', 'email', 'zone', 'age'];
+  const NO_BLUR_ERROR = ['fullName']; // validated internally on Continue; never flashed while typing or on blur
+
+  step1FieldIds.forEach(function(id){
+    const field = document.getElementById(id);
+    const errorEl = document.getElementById(id + 'Error');
+    const noBlurError = NO_BLUR_ERROR.includes(id);
+    function validateField(showError){
+      const ok = field.checkValidity() && field.value.trim() !== '';
+      field.classList.toggle('invalid', !ok && showError);
+      field.classList.toggle('valid', ok && field.value.trim() !== '');
+      if (errorEl) errorEl.classList.toggle('show', !ok && showError);
+      return ok;
+    }
+    // While typing: only clear an existing error once the value becomes valid.
+    // Never pop the error up mid-keystroke — that happens on blur (or Continue for fullName) instead.
+    field.addEventListener('input', function(){
+      const ok = field.checkValidity() && field.value.trim() !== '';
+      if (ok) validateField(false); // clears error + shows valid state
+      else { field.classList.remove('invalid'); if (errorEl) errorEl.classList.remove('show'); }
+    });
+    field.addEventListener('focus', function(){
+      field.classList.remove('invalid');
+      if (errorEl) errorEl.classList.remove('show');
+    });
+    field.addEventListener('blur', function(){
+      if (noBlurError){
+        // only ever show the valid/green state on blur, never the red error
+        if (field.checkValidity() && field.value.trim() !== '') validateField(false);
+        return;
+      }
+      validateField(field.value.trim() !== '');
+    });
+    field._validate = validateField;
+  });
+
+  document.querySelectorAll('input[name="skill"]').forEach(function(radio){
+    radio.addEventListener('change', function(){
+      document.querySelectorAll('.skill-card').forEach(function(card){ card.classList.remove('selected'); });
+      if (this.checked) this.closest('.skill-card').classList.add('selected');
+    });
+  });
+  const node1 = document.querySelector('.stepper .node[data-step="1"]');
+  const node2 = document.querySelector('.stepper .node[data-step="2"]');
+  const stepLine = document.querySelector('.stepper .line');
+  const stepLabel = document.getElementById('stepLabel');
+
+  document.getElementById('toStep2').addEventListener('click', function(){
+    let allValid = true;
+    let firstInvalid = null;
+    step1FieldIds.forEach(function(id){
+      const field = document.getElementById(id);
+      const ok = field._validate(true);
+      if (!ok && !firstInvalid) firstInvalid = field;
+      if (!ok) allValid = false;
+    });
+    if (!allValid){
+      firstInvalid.reportValidity();
+      firstInvalid.focus();
+      return;
+    }
+    step1.classList.remove('active');
+    step2.classList.add('active');
+    node1.classList.remove('active'); node1.classList.add('done');
+    node2.classList.add('active');
+    stepLine.classList.add('filled');
+    stepLabel.textContent = 'Step 2 of 2 — Skill & goals';
+  });
+
+  document.getElementById('toStep1').addEventListener('click', function(){
+    step2.classList.remove('active');
+    step1.classList.add('active');
+    node2.classList.remove('active');
+    node1.classList.remove('done'); node1.classList.add('active');
+    stepLine.classList.remove('filled');
+    stepLabel.textContent = 'Step 1 of 2 — Your details';
+  });
+
+  document.getElementById('regForm').addEventListener('submit', async function(e){
+    e.preventDefault();
+
+    if (isGibberish(expectField.value)){
+      expectError.classList.add('show');
+      expectField.focus();
+      expectField.scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
+
+    const submitBtn = document.getElementById('submitBtn');
+    const submitBtnText = document.getElementById('submitBtnText');
+    const submitError = document.getElementById('submitError');
+    submitError.classList.remove('show');
+
+    const payload = {
+      fullName: document.getElementById('fullName').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      zone: document.getElementById('zone').value.trim(),
+      age: document.getElementById('age').value,
+      skill: document.querySelector('input[name=skill]:checked')?.value,
+      expectation: expectField.value.trim(),
+    };
+
+    submitBtn.disabled = true;
+    document.getElementById('toStep1').disabled = true;
+    submitBtnText.textContent = 'Submitting…';
+
+    try {
+      const res = await fetch('/.netlify/functions/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.error || 'Something went wrong. Please try again.');
+      }
+
+      const name = payload.fullName.split(' ')[0] || 'friend';
+      document.getElementById('successName').textContent = name;
+      document.getElementById('formPanel').style.display = 'none';
+      document.getElementById('stepperNodes').style.display = 'none';
+      document.getElementById('stepLabel').style.display = 'none';
+      document.getElementById('successPanel').classList.add('show');
+    } catch (err) {
+      submitError.textContent = err.message || 'Something went wrong. Please try again.';
+      submitError.classList.add('show');
+      submitBtn.disabled = false;
+      document.getElementById('toStep1').disabled = false;
+      submitBtnText.textContent = 'Register';
+    }
+  });
+</script>
+
+</body>
+</html>
