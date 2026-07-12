@@ -290,6 +290,17 @@
   .success h2{font-size:24px; margin:0 0 10px; color:var(--black);}
   .success p{color:var(--ink-soft); font-size:14px; line-height:1.6; max-width:360px; margin:0 auto 6px;}
   .success .name{color:var(--orange); font-weight:800;}
+  .whatsapp-cta{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    margin:24px auto 0; max-width:280px; background:#25D366; color:#FFFFFF;
+    text-decoration:none; padding:14px 22px; border-radius:12px;
+    font-family:'Work Sans', Arial, Helvetica, sans-serif; font-weight:700; font-size:15px;
+    box-shadow:0 10px 24px rgba(37,211,102,0.32);
+    transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+  }
+  .whatsapp-cta svg{width:22px; height:22px; flex:0 0 auto;}
+  .whatsapp-cta:hover{background:#1EBE5B; transform:translateY(-2px); box-shadow:0 14px 30px rgba(37,211,102,0.4);}
+  .whatsapp-cta:active{transform:translateY(0) scale(0.98);}
   .success .next{margin-top:20px; text-align:left; background:var(--ash); border:1px solid var(--line); border-radius:12px; padding:16px 18px; font-size:12.5px; color:var(--ink-soft);}
   .success .next b{color:var(--ink); display:block; margin-bottom:6px; font-size:11.5px; letter-spacing:0.5px;}
 
@@ -516,9 +527,15 @@
       </div>
       <h2 class="display">You're in!</h2>
       <p>Thanks for registering, <span class="name" id="successName">friend</span>. We've saved your spot for the LP 7 Media Bootcamp.</p>
+
+      <a href="#" id="successWhatsappBtn" target="_blank" rel="noopener" class="whatsapp-cta">
+        <svg viewBox="0 0 24 24" fill="white"><path d="M17.47 14.38c-.29-.15-1.7-.84-1.97-.93-.26-.1-.46-.15-.65.14-.2.3-.75.94-.92 1.13-.17.2-.34.22-.63.08-.3-.15-1.24-.46-2.36-1.46-.87-.78-1.46-1.74-1.63-2.03-.17-.3-.02-.46.13-.6.13-.13.3-.34.44-.51.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.51-.08-.15-.65-1.58-.9-2.16-.24-.58-.48-.5-.65-.5-.17 0-.37-.02-.56-.02s-.51.08-.78.37c-.26.3-1.02 1-1.02 2.42 0 1.43 1.05 2.82 1.19 3.01.15.2 2.06 3.14 5 4.4.7.3 1.24.48 1.67.62.7.22 1.34.19 1.84.12.56-.08 1.7-.7 1.94-1.36.24-.67.24-1.24.17-1.36-.07-.12-.26-.2-.55-.34z"/><path d="M20.52 3.45A11.86 11.86 0 0 0 12.02 0C5.5 0 .2 5.28.2 11.78c0 2.08.55 4.1 1.58 5.9L0 24l6.5-1.7a11.8 11.8 0 0 0 5.5 1.4h.01c6.51 0 11.8-5.28 11.8-11.78 0-3.15-1.22-6.1-3.4-8.32zM12.02 21.6h-.01a9.8 9.8 0 0 1-5-1.36l-.36-.21-3.86 1 1.03-3.76-.24-.39a9.8 9.8 0 0 1-1.5-5.2c0-5.42 4.42-9.83 9.85-9.83 2.63 0 5.1 1.03 6.96 2.88a9.75 9.75 0 0 1 2.88 6.95c0 5.42-4.42 9.92-9.85 9.92z"/></svg>
+        <span>Join Your WhatsApp Group</span>
+      </a>
+
       <div class="next">
         <b>WHAT HAPPENS NEXT</b>
-        A confirmation email is on its way to your inbox. Watch out for a WhatsApp/Telegram invite from the Lagos Province 7 Media Team closer to the 17th of August, with your class schedule and joining instructions.
+        A confirmation email is on its way to your inbox with all the details above. Tap the button to join your class group now — that's where the schedule and joining instructions will be shared.
       </div>
     </div>
   </div>
@@ -606,6 +623,7 @@
   step1FieldIds.forEach(function(id){
     const field = document.getElementById(id);
     const errorEl = document.getElementById(id + 'Error');
+    const defaultErrorText = errorEl ? errorEl.textContent : '';
     const noBlurError = NO_BLUR_ERROR.includes(id);
     function validateField(showError){
       const ok = field.checkValidity() && field.value.trim() !== '';
@@ -617,11 +635,13 @@
     // While typing: only clear an existing error once the value becomes valid.
     // Never pop the error up mid-keystroke — that happens on blur (or Continue for fullName) instead.
     field.addEventListener('input', function(){
+      if (errorEl) errorEl.textContent = defaultErrorText; // clears any stale "already registered" message
       const ok = field.checkValidity() && field.value.trim() !== '';
       if (ok) validateField(false); // clears error + shows valid state
       else { field.classList.remove('invalid'); if (errorEl) errorEl.classList.remove('show'); }
     });
     field.addEventListener('focus', function(){
+      if (errorEl) errorEl.textContent = defaultErrorText;
       field.classList.remove('invalid');
       if (errorEl) errorEl.classList.remove('show');
     });
@@ -647,7 +667,7 @@
   const stepLine = document.querySelector('.stepper .line');
   const stepLabel = document.getElementById('stepLabel');
 
-  document.getElementById('toStep2').addEventListener('click', function(){
+  document.getElementById('toStep2').addEventListener('click', async function(){
     let allValid = true;
     let firstInvalid = null;
     step1FieldIds.forEach(function(id){
@@ -661,6 +681,39 @@
       firstInvalid.focus();
       return;
     }
+
+    const emailField = document.getElementById('email');
+    const emailErrorEl = document.getElementById('emailError');
+    const continueBtn = this;
+    const originalBtnHtml = continueBtn.innerHTML;
+    continueBtn.disabled = true;
+    continueBtn.textContent = 'Checking…';
+
+    try {
+      const res = await fetch('/.netlify/functions/check-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: emailField.value.trim() }),
+      });
+      const result = await res.json();
+
+      if (result.registered){
+        emailField.classList.add('invalid');
+        emailErrorEl.textContent = 'This email has already registered for the bootcamp.';
+        emailErrorEl.classList.add('show');
+        emailField.focus();
+        continueBtn.disabled = false;
+        continueBtn.innerHTML = originalBtnHtml;
+        return;
+      }
+    } catch (err) {
+      // If the check itself fails (network hiccup), don't block a legitimate registrant —
+      // register.js still enforces the real duplicate check when they hit Register.
+    }
+
+    continueBtn.disabled = false;
+    continueBtn.innerHTML = originalBtnHtml;
+
     step1.classList.remove('active');
     step2.classList.add('active');
     node1.classList.remove('active'); node1.classList.add('done');
@@ -693,6 +746,13 @@
     const submitError = document.getElementById('submitError');
     submitError.classList.remove('show');
 
+    const WHATSAPP_GROUPS = {
+      'Smartphone Photography & Videography': 'https://chat.whatsapp.com/BPfAyzqukvH7n91cSqRQ6f',
+      'AI Animation & Video Editing': 'https://chat.whatsapp.com/GucFloYHUtbEDVYeWGIiZ9',
+      'Graphic Design': 'https://chat.whatsapp.com/Im7LGZohQP11DMyigKdbYw',
+      'Web Development': 'https://chat.whatsapp.com/Ex0poMeO4lpJ14v8ceIJMI?s=cl&p=a&ilr=4&amv=2',
+    };
+
     const payload = {
       fullName: document.getElementById('fullName').value.trim(),
       email: document.getElementById('email').value.trim(),
@@ -720,6 +780,7 @@
 
       const name = payload.fullName.split(' ')[0] || 'friend';
       document.getElementById('successName').textContent = name;
+      document.getElementById('successWhatsappBtn').href = WHATSAPP_GROUPS[payload.skill] || 'https://whatsapp.com/channel/0029Vb6o8JiADTODuIXY4Q15';
       document.getElementById('formPanel').style.display = 'none';
       document.getElementById('stepperNodes').style.display = 'none';
       document.getElementById('stepLabel').style.display = 'none';
