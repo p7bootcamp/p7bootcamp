@@ -87,8 +87,15 @@
   .stat-card .n{font-family:'Work Sans', Arial, Helvetica, sans-serif; font-weight:800; font-size:22px; color:var(--orange);}
   .stat-card .l{font-size:11px; color:var(--ink-soft); font-weight:700; text-transform:uppercase; letter-spacing:0.4px;}
 
-  .section-title{font-size:16px; font-weight:800; color:var(--ink); margin:32px 0 14px;}
-  .section-title:first-of-type{margin-top:0;}
+  .tabs{display:flex; gap:6px; margin-bottom:20px; border-bottom:1px solid var(--line);}
+  .tab{
+    background:none; border:none; padding:10px 4px; margin-right:20px; cursor:pointer;
+    font-size:13.5px; font-weight:700; color:var(--ink-soft);
+    border-bottom:2px solid transparent; margin-bottom:-1px;
+  }
+  .tab.active{color:var(--orange-deep); border-bottom-color:var(--orange);}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
   .chart-card{background:var(--white); border:1px solid var(--line); border-radius:14px; padding:18px 18px 14px; margin-bottom:14px;}
   .chart-title{font-size:11px; font-weight:700; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.4px; margin-bottom:14px;}
   .chart-empty{padding:30px 10px; text-align:center; color:var(--ink-soft); font-size:13px;}
@@ -152,55 +159,62 @@
     </div>
   </div>
 
-  <div class="section-title">Traffic</div>
-  <div class="stats-row" id="analyticsStats"></div>
-  <div class="chart-card">
-    <div class="chart-title">Views &amp; unique visitors — last 14 days</div>
-    <canvas id="viewsChart" height="160"></canvas>
-    <div class="chart-empty" id="viewsChartEmpty" style="display:none;">No page view data yet.</div>
-  </div>
-  <div class="chart-card">
-    <div class="chart-title">Top traffic sources</div>
-    <canvas id="sourcesChart" height="160"></canvas>
-    <div class="chart-empty" id="sourcesChartEmpty" style="display:none;">No page view data yet.</div>
+  <div class="tabs">
+    <button class="tab active" data-tab="registrants">Registrants</button>
+    <button class="tab" data-tab="traffic">Traffic</button>
   </div>
 
-  <div class="section-title">Registrants</div>
-  <div class="filter-bar">
-    <input type="text" id="searchInput" placeholder="Search name or email…">
-    <select id="skillFilter">
-      <option value="">All skills</option>
-      <option value="Smartphone Photography & Videography">Photography & Videography</option>
-      <option value="AI Animation & Video Editing">AI Animation & Video Editing</option>
-      <option value="Graphic Design">Graphic Design</option>
-      <option value="Web Development">Web Development</option>
-    </select>
-    <select id="zoneFilter">
-      <option value="">All zones</option>
-    </select>
-    <button class="dash-btn" id="clearFiltersBtn">Clear</button>
-    <span class="filter-count" id="filterCount"></span>
+  <div class="tab-panel active" id="panel-registrants">
+    <div class="filter-bar">
+      <input type="text" id="searchInput" placeholder="Search name or email…">
+      <select id="skillFilter">
+        <option value="">All skills</option>
+        <option value="Smartphone Photography & Videography">Photography & Videography</option>
+        <option value="AI Animation & Video Editing">AI Animation & Video Editing</option>
+        <option value="Graphic Design">Graphic Design</option>
+        <option value="Web Development">Web Development</option>
+      </select>
+      <select id="zoneFilter">
+        <option value="">All zones</option>
+      </select>
+      <button class="dash-btn" id="clearFiltersBtn">Clear</button>
+      <span class="filter-count" id="filterCount"></span>
+    </div>
+
+    <div class="stats-row" id="statsRow"></div>
+
+    <div class="table-wrap">
+      <table id="registrantsTable" style="display:none;">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Zone</th>
+            <th>Age</th>
+            <th>Skill</th>
+            <th>Expectation</th>
+            <th>Registered</th>
+          </tr>
+        </thead>
+        <tbody id="registrantsBody"></tbody>
+      </table>
+      <div class="loading-state" id="loadingState">Loading registrants…</div>
+      <div class="empty-state" id="emptyState" style="display:none;">No registrations yet.</div>
+    </div>
   </div>
 
-  <div class="stats-row" id="statsRow"></div>
-
-  <div class="table-wrap">
-    <table id="registrantsTable" style="display:none;">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Zone</th>
-          <th>Age</th>
-          <th>Skill</th>
-          <th>Expectation</th>
-          <th>Registered</th>
-        </tr>
-      </thead>
-      <tbody id="registrantsBody"></tbody>
-    </table>
-    <div class="loading-state" id="loadingState">Loading registrants…</div>
-    <div class="empty-state" id="emptyState" style="display:none;">No registrations yet.</div>
+  <div class="tab-panel" id="panel-traffic">
+    <div class="stats-row" id="analyticsStats"></div>
+    <div class="chart-card">
+      <div class="chart-title">Views &amp; unique visitors — last 14 days</div>
+      <canvas id="viewsChart" height="160"></canvas>
+      <div class="chart-empty" id="viewsChartEmpty" style="display:none;">No page view data yet.</div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Top traffic sources</div>
+      <canvas id="sourcesChart" height="160"></canvas>
+      <div class="chart-empty" id="sourcesChartEmpty" style="display:none;">No page view data yet.</div>
+    </div>
   </div>
 </div>
 
@@ -208,6 +222,8 @@
   let currentPassword = '';
   let allRegistrants = [];
   let currentRegistrants = []; // currently filtered/visible set — this is what gets exported
+  let cachedAnalyticsViews = null;
+  let analyticsRendered = false;
 
   const gate = document.getElementById('gate');
   const dashboard = document.getElementById('dashboard');
@@ -408,12 +424,31 @@
 
     try {
       const analyticsData = await fetchAnalytics(password);
-      renderAnalytics(analyticsData.views || []);
+      cachedAnalyticsViews = analyticsData.views || [];
     } catch (err) {
-      // Don't let a broken analytics fetch take down the registrants view — just show it empty.
-      renderAnalytics([]);
+      cachedAnalyticsViews = [];
+    }
+    analyticsRendered = false; // force a re-render next time the Traffic tab is opened
+    if (document.getElementById('panel-traffic').classList.contains('active')) {
+      renderAnalytics(cachedAnalyticsViews);
+      analyticsRendered = true;
     }
   }
+
+  document.querySelectorAll('.tab').forEach(tabBtn => {
+    tabBtn.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      tabBtn.classList.add('active');
+      const panel = document.getElementById('panel-' + tabBtn.dataset.tab);
+      panel.classList.add('active');
+
+      if (tabBtn.dataset.tab === 'traffic' && !analyticsRendered && cachedAnalyticsViews !== null) {
+        renderAnalytics(cachedAnalyticsViews);
+        analyticsRendered = true;
+      }
+    });
+  });
 
   function populateZoneFilter(list) {
     const zones = [...new Set(list.map(r => (r.zone || '').trim()).filter(Boolean))]
