@@ -388,6 +388,28 @@
 </style>
 </head>
 <body>
+<script>
+(function(){
+  try {
+    var KEY = 'p7_visitor_id';
+    var visitorId = localStorage.getItem(KEY);
+    if (!visitorId) {
+      visitorId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('v-' + Date.now() + '-' + Math.random().toString(36).slice(2));
+      localStorage.setItem(KEY, visitorId);
+    }
+    fetch('/.netlify/functions/track-view', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        path: window.location.pathname,
+        referrer: document.referrer || '',
+        visitorId: visitorId,
+      }),
+      keepalive: true,
+    }).catch(function(){});
+  } catch (e) { /* analytics should never break the page */ }
+})();
+</script>
 
 <nav>
   <div class="brand">

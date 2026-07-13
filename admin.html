@@ -8,6 +8,7 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
   :root{
     --black:#14100C; --orange:#F2650F; --orange-deep:#C8480A; --white:#FFFFFF;
@@ -86,6 +87,12 @@
   .stat-card .n{font-family:'Work Sans', Arial, Helvetica, sans-serif; font-weight:800; font-size:22px; color:var(--orange);}
   .stat-card .l{font-size:11px; color:var(--ink-soft); font-weight:700; text-transform:uppercase; letter-spacing:0.4px;}
 
+  .section-title{font-size:16px; font-weight:800; color:var(--ink); margin:32px 0 14px;}
+  .section-title:first-of-type{margin-top:0;}
+  .chart-card{background:var(--white); border:1px solid var(--line); border-radius:14px; padding:18px 18px 14px; margin-bottom:14px;}
+  .chart-title{font-size:11px; font-weight:700; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.4px; margin-bottom:14px;}
+  .chart-empty{padding:30px 10px; text-align:center; color:var(--ink-soft); font-size:13px;}
+
   .table-wrap{background:var(--white); border:1px solid var(--line); border-radius:14px; overflow-x:auto;}
   table{width:100%; border-collapse:collapse; font-size:13px;}
   th{
@@ -145,6 +152,20 @@
     </div>
   </div>
 
+  <div class="section-title">Traffic</div>
+  <div class="stats-row" id="analyticsStats"></div>
+  <div class="chart-card">
+    <div class="chart-title">Views &amp; unique visitors — last 14 days</div>
+    <canvas id="viewsChart" height="160"></canvas>
+    <div class="chart-empty" id="viewsChartEmpty" style="display:none;">No page view data yet.</div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">Top traffic sources</div>
+    <canvas id="sourcesChart" height="160"></canvas>
+    <div class="chart-empty" id="sourcesChartEmpty" style="display:none;">No page view data yet.</div>
+  </div>
+
+  <div class="section-title">Registrants</div>
   <div class="filter-bar">
     <input type="text" id="searchInput" placeholder="Search name or email…">
     <select id="skillFilter">
@@ -209,6 +230,121 @@
     return res.json();
   }
 
+  async function fetchAnalytics(password) {
+    const res = await fetch('/.netlify/functions/get-analytics', {
+      headers: { 'x-admin-password': password },
+    });
+    if (!res.ok) throw new Error('Could not load analytics.');
+    return res.json();
+  }
+
+  function bucketReferrer(ref) {
+    if (!ref) return 'Direct / Unknown';
+    try {
+      const host = new URL(ref).hostname.replace(/^www\./, '');
+      if (host.includes('google')) return 'Google';
+      if (host.includes('facebook')) return 'Facebook';
+      if (host.includes('instagram')) return 'Instagram';
+      if (host.includes('whatsapp')) return 'WhatsApp';
+      if (host.includes('t.co') || host.includes('twitter') || host.includes('x.com')) return 'X / Twitter';
+      if (host.includes('lp7mediabootcamp') || host.includes('netlify.app')) return 'Internal';
+      return host;
+    } catch (e) {
+      return 'Direct / Unknown';
+    }
+  }
+
+  let viewsChartInstance = null;
+  let sourcesChartInstance = null;
+
+  function renderAnalytics(views) {
+    const totalViews = views.length;
+    const uniqueVisitors = new Set(views.map(v => v.visitorId).filter(Boolean)).size;
+
+    document.getElementById('analyticsStats').innerHTML = `
+      <div class="stat-card"><div class="n">${totalViews}</div><div class="l">Total page views</div></div>
+      <div class="stat-card"><div class="n">${uniqueVisitors}</div><div class="l">Unique visitors</div></div>
+    `;
+
+    const viewsCanvas = document.getElementById('viewsChart');
+    const viewsEmpty = document.getElementById('viewsChartEmpty');
+    const sourcesCanvas = document.getElementById('sourcesChart');
+    const sourcesEmpty = document.getElementById('sourcesChartEmpty');
+
+    if (totalViews === 0) {
+      viewsCanvas.style.display = 'none'; viewsEmpty.style.display = 'block';
+      sourcesCanvas.style.display = 'none'; sourcesEmpty.style.display = 'block';
+      return;
+    }
+    viewsCanvas.style.display = 'block'; viewsEmpty.style.display = 'none';
+    sourcesCanvas.style.display = 'block'; sourcesEmpty.style.display = 'none';
+
+    // Last 14 days
+    const days = [];
+    const today = new Date();
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      days.push(d.toISOString().slice(0, 10));
+    }
+    const viewsByDay = {}; const visitorsByDay = {};
+    days.forEach(d => { viewsByDay[d] = 0; visitorsByDay[d] = new Set(); });
+    views.forEach(v => {
+      if (!v.createdAt) return;
+      const key = v.createdAt.slice(0, 10);
+      if (Object.prototype.hasOwnProperty.call(viewsByDay, key)) {
+        viewsByDay[key]++;
+        if (v.visitorId) visitorsByDay[key].add(v.visitorId);
+      }
+    });
+    const dayLabels = days.map(d => new Date(d + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
+    const viewCounts = days.map(d => viewsByDay[d]);
+    const visitorCounts = days.map(d => visitorsByDay[d].size);
+
+    if (viewsChartInstance) viewsChartInstance.destroy();
+    viewsChartInstance = new Chart(viewsCanvas, {
+      type: 'line',
+      data: {
+        labels: dayLabels,
+        datasets: [
+          { label: 'Page views', data: viewCounts, borderColor: '#F2650F', backgroundColor: 'rgba(242,101,15,0.10)', tension: 0.35, fill: true, pointRadius: 3 },
+          { label: 'Unique visitors', data: visitorCounts, borderColor: '#14100C', backgroundColor: 'rgba(20,16,12,0.05)', tension: 0.35, fill: true, pointRadius: 3 },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0, font: { size: 10 } } }, x: { ticks: { font: { size: 10 } } } },
+      },
+    });
+
+    // Top sources
+    const bucketCounts = {};
+    views.forEach(v => {
+      const b = bucketReferrer(v.referrer);
+      bucketCounts[b] = (bucketCounts[b] || 0) + 1;
+    });
+    const sorted = Object.entries(bucketCounts).sort((a, b) => b[1] - a[1]);
+    const top = sorted.slice(0, 6);
+    const otherTotal = sorted.slice(6).reduce((sum, [, c]) => sum + c, 0);
+    if (otherTotal > 0) top.push(['Other', otherTotal]);
+
+    if (sourcesChartInstance) sourcesChartInstance.destroy();
+    sourcesChartInstance = new Chart(sourcesCanvas, {
+      type: 'bar',
+      data: {
+        labels: top.map(t => t[0]),
+        datasets: [{ label: 'Views', data: top.map(t => t[1]), backgroundColor: '#F2650F', borderRadius: 6, maxBarThickness: 28 }],
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { x: { beginAtZero: true, ticks: { precision: 0, font: { size: 10 } } }, y: { ticks: { font: { size: 11 } } } },
+      },
+    });
+  }
+
   function renderStats(list) {
     const bySkill = {};
     list.forEach(r => { bySkill[r.skill] = (bySkill[r.skill] || 0) + 1; });
@@ -268,6 +404,14 @@
       document.getElementById('lastUpdated').textContent = 'Updated ' + new Date().toLocaleString();
     } catch (err) {
       document.getElementById('loadingState').textContent = err.message;
+    }
+
+    try {
+      const analyticsData = await fetchAnalytics(password);
+      renderAnalytics(analyticsData.views || []);
+    } catch (err) {
+      // Don't let a broken analytics fetch take down the registrants view — just show it empty.
+      renderAnalytics([]);
     }
   }
 
