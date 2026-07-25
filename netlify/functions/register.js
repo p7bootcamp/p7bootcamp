@@ -57,7 +57,7 @@ exports.handler = async function (event) {
     return { statusCode: 400, body: JSON.stringify({ error: 'Please enter a valid Gmail address.' }) };
   }
   if (!zone) {
-    return { statusCode: 400, body: JSON.stringify({ error: 'Please enter your zone.' }) };
+    return { statusCode: 400, body: JSON.stringify({ error: 'Please enter your parish.' }) };
   }
   if (!age || age < 10 || age > 25) {
     return { statusCode: 400, body: JSON.stringify({ error: 'Age must be between 10 and 25.' }) };
