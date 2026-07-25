@@ -175,7 +175,7 @@
         <option value="Web Development">Web Development</option>
       </select>
       <select id="zoneFilter">
-        <option value="">All zones</option>
+        <option value="">All parishes</option>
       </select>
       <button class="dash-btn" id="clearFiltersBtn">Clear</button>
       <span class="filter-count" id="filterCount"></span>
@@ -189,7 +189,7 @@
           <tr>
             <th>Name</th>
             <th>Email</th>
-            <th>Zone</th>
+            <th>Parish</th>
             <th>Age</th>
             <th>Skill</th>
             <th>Expectation</th>
@@ -454,7 +454,7 @@
     const zones = [...new Set(list.map(r => (r.zone || '').trim()).filter(Boolean))]
       .sort((a, b) => a.localeCompare(b));
     const selected = zoneFilter.value;
-    zoneFilter.innerHTML = '<option value="">All zones</option>' +
+    zoneFilter.innerHTML = '<option value="">All parishes</option>' +
       zones.map(z => `<option value="${escapeHtml(z)}">${escapeHtml(z)}</option>`).join('');
     if (zones.includes(selected)) zoneFilter.value = selected;
   }
@@ -533,7 +533,7 @@
 
   document.getElementById('exportBtn').addEventListener('click', () => {
     if (!currentRegistrants.length) return;
-    const headers = ['Full Name', 'Email', 'Zone', 'Age', 'Skill', 'Expectation', 'Registered'];
+    const headers = ['Full Name', 'Email', 'Parish', 'Age', 'Skill', 'Expectation', 'Registered'];
     const rows = currentRegistrants.map(r => [
       r.fullName, r.email, r.zone, r.age, r.skill,
       (r.expectation || '').replace(/"/g, '""'),
