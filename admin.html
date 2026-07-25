@@ -112,6 +112,14 @@
     display:inline-block; background:#FFF4EC; color:var(--orange-deep); font-size:11px; font-weight:700;
     padding:3px 9px; border-radius:20px; white-space:nowrap;
   }
+  .status-tag{
+    display:inline-block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.3px;
+    padding:3px 9px; border-radius:20px; white-space:nowrap;
+  }
+  .status-pending{background:#FFF4EC; color:var(--orange-deep);}
+  .status-accepted{background:#EAF6EC; color:#2E7D32;}
+  .status-rejected{background:#F1EFEA; color:var(--ink-soft);}
+  .status-removed{background:#FDEDE8; color:var(--orange-deep);}
   .cell-name{font-weight:700;}
   .cell-expect{max-width:240px; color:var(--ink-soft); font-size:12.5px;}
   .empty-state{padding:50px 20px; text-align:center; color:var(--ink-soft); font-size:14px;}
@@ -136,7 +144,7 @@
       <span>LAPSETA · Media Department</span>
     </div>
     <h1 class="display">Admin Access</h1>
-    <p>Enter the dashboard password to view registrants.</p>
+    <p id="gateCopy">Enter the dashboard password to view registrants. Invited admins should use the link from their invite email instead.</p>
     <input type="password" id="passwordInput" placeholder="Password" autocomplete="off">
     <button type="button" id="gateSubmit">Enter</button>
     <div class="gate-error" id="gateError">Incorrect password. Try again.</div>
@@ -162,6 +170,7 @@
   <div class="tabs">
     <button class="tab active" data-tab="registrants">Registrants</button>
     <button class="tab" data-tab="traffic">Traffic</button>
+    <button class="tab" data-tab="admins" id="adminsTabBtn" style="display:none;">Admins</button>
   </div>
 
   <div class="tab-panel active" id="panel-registrants">
@@ -216,16 +225,45 @@
       <div class="chart-empty" id="sourcesChartEmpty" style="display:none;">No page view data yet.</div>
     </div>
   </div>
+
+  <div class="tab-panel" id="panel-admins">
+    <div class="filter-bar">
+      <input type="text" id="inviteNameInput" placeholder="Name…">
+      <input type="text" id="inviteEmailInput" placeholder="Email to invite…">
+      <button class="dash-btn primary" id="inviteSendBtn">Send Invite</button>
+      <span class="filter-count" id="inviteStatusMsg"></span>
+    </div>
+    <div class="table-wrap">
+      <table id="invitesTable" style="display:none;">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Invited</th>
+            <th>Responded</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="invitesBody"></tbody>
+      </table>
+      <div class="loading-state" id="invitesLoadingState">Loading invites…</div>
+      <div class="empty-state" id="invitesEmptyState" style="display:none;">No admins invited yet.</div>
+    </div>
+  </div>
 </div>
 
 <script>
-  let currentPassword = '';
+  let currentKey = '';       // password (master) or invite token (invited admin) — sent as x-admin-key
+  let currentRole = '';      // 'master' | 'invited'
   let allRegistrants = [];
   let currentRegistrants = []; // currently filtered/visible set — this is what gets exported
   let cachedAnalyticsViews = null;
   let analyticsRendered = false;
 
   const gate = document.getElementById('gate');
+  const gateCopy = document.getElementById('gateCopy');
   const dashboard = document.getElementById('dashboard');
   const passwordInput = document.getElementById('passwordInput');
   const gateError = document.getElementById('gateError');
@@ -234,21 +272,27 @@
   const skillFilter = document.getElementById('skillFilter');
   const zoneFilter = document.getElementById('zoneFilter');
   const filterCount = document.getElementById('filterCount');
+  const adminsTabBtn = document.getElementById('adminsTabBtn');
 
-  async function fetchRegistrants(password) {
+  async function fetchRegistrants(key) {
     const res = await fetch('/.netlify/functions/get-registrants', {
-      headers: { 'x-admin-password': password },
+      headers: { 'x-admin-key': key },
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(res.status === 401 ? 'Incorrect password.' : (err.error || 'Could not load registrants.'));
+      const message = err.error === 'Your admin access has been removed.'
+        ? err.error
+        : (res.status === 401 ? 'Incorrect password or invalid invite.' : (err.error || 'Could not load registrants.'));
+      const error = new Error(message);
+      error.removed = err.error === 'Your admin access has been removed.';
+      throw error;
     }
     return res.json();
   }
 
-  async function fetchAnalytics(password) {
+  async function fetchAnalytics(key) {
     const res = await fetch('/.netlify/functions/get-analytics', {
-      headers: { 'x-admin-password': password },
+      headers: { 'x-admin-key': key },
     });
     if (!res.ok) throw new Error('Could not load analytics.');
     return res.json();
@@ -408,22 +452,26 @@
     return div.innerHTML;
   }
 
-  async function loadDashboard(password) {
+  async function loadDashboard(key) {
     document.getElementById('loadingState').style.display = 'block';
     document.getElementById('registrantsTable').style.display = 'none';
     document.getElementById('emptyState').style.display = 'none';
     try {
-      const data = await fetchRegistrants(password);
+      const data = await fetchRegistrants(key);
       allRegistrants = data.registrants || [];
       populateZoneFilter(allRegistrants);
       applyFilters();
       document.getElementById('lastUpdated').textContent = 'Updated ' + new Date().toLocaleString();
     } catch (err) {
+      if (err.removed) {
+        handleRemoved();
+        return;
+      }
       document.getElementById('loadingState').textContent = err.message;
     }
 
     try {
-      const analyticsData = await fetchAnalytics(password);
+      const analyticsData = await fetchAnalytics(key);
       cachedAnalyticsViews = analyticsData.views || [];
     } catch (err) {
       cachedAnalyticsViews = [];
@@ -433,7 +481,112 @@
       renderAnalytics(cachedAnalyticsViews);
       analyticsRendered = true;
     }
+
+    if (currentRole === 'master') {
+      adminsTabBtn.style.display = '';
+      loadInvites();
+    } else {
+      adminsTabBtn.style.display = 'none';
+    }
   }
+
+  // Called when the server tells us this session's invite has been removed —
+  // clear the stored token and drop back to the gate with an explanatory message.
+  function handleRemoved() {
+    localStorage.removeItem('p7AdminToken');
+    currentKey = '';
+    currentRole = '';
+    dashboard.classList.remove('show');
+    gate.style.display = 'flex';
+    gateCopy.textContent = 'Your admin access has been removed. Contact the main admin if you think this is a mistake.';
+    passwordInput.value = '';
+  }
+
+  async function loadInvites() {
+    const table = document.getElementById('invitesTable');
+    const loading = document.getElementById('invitesLoadingState');
+    const empty = document.getElementById('invitesEmptyState');
+    loading.style.display = 'block';
+    table.style.display = 'none';
+    empty.style.display = 'none';
+    try {
+      const res = await fetch('/.netlify/functions/list-invites', { headers: { 'x-admin-key': currentKey } });
+      if (!res.ok) throw new Error('Could not load invites.');
+      const data = await res.json();
+      renderInvites(data.invites || []);
+    } catch (err) {
+      loading.textContent = err.message;
+    }
+  }
+
+  function renderInvites(invites) {
+    const table = document.getElementById('invitesTable');
+    const loading = document.getElementById('invitesLoadingState');
+    const empty = document.getElementById('invitesEmptyState');
+    const tbody = document.getElementById('invitesBody');
+    loading.style.display = 'none';
+
+    if (!invites.length) {
+      empty.style.display = 'block';
+      return;
+    }
+    table.style.display = 'table';
+    tbody.innerHTML = invites.map(inv => `
+      <tr>
+        <td class="cell-name">${escapeHtml(inv.name || '—')}</td>
+        <td>${escapeHtml(inv.email)}</td>
+        <td><span class="skill-tag">Admin</span></td>
+        <td><span class="status-tag status-${inv.status}">${escapeHtml(inv.status)}</span></td>
+        <td>${inv.invitedAt ? new Date(inv.invitedAt).toLocaleString() : '—'}</td>
+        <td>${inv.respondedAt ? new Date(inv.respondedAt).toLocaleString() : '—'}</td>
+        <td>${inv.status === 'removed' ? '' : `<button class="dash-btn" data-remove-token="${escapeHtml(inv.token)}">Remove</button>`}</td>
+      </tr>
+    `).join('');
+
+    tbody.querySelectorAll('[data-remove-token]').forEach(btn => {
+      btn.addEventListener('click', () => removeAdmin(btn.dataset.removeToken));
+    });
+  }
+
+  async function removeAdmin(token) {
+    if (!confirm('Remove this admin\u2019s access to the dashboard?')) return;
+    try {
+      const res = await fetch('/.netlify/functions/remove-admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-key': currentKey },
+        body: JSON.stringify({ token }),
+      });
+      if (!res.ok) throw new Error('Could not remove admin.');
+      loadInvites();
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  document.getElementById('inviteSendBtn').addEventListener('click', async () => {
+    const nameInput = document.getElementById('inviteNameInput');
+    const emailInput = document.getElementById('inviteEmailInput');
+    const statusMsg = document.getElementById('inviteStatusMsg');
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim();
+    if (!name || !email) return;
+    statusMsg.textContent = 'Sending…';
+    try {
+      const res = await fetch('/.netlify/functions/invite-admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-key': currentKey },
+        body: JSON.stringify({ name, email }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Could not send invite.');
+      statusMsg.textContent = data.emailSent ? 'Invite sent.' : 'Invite created, but the email may not have sent.';
+      nameInput.value = '';
+      emailInput.value = '';
+      loadInvites();
+    } catch (err) {
+      statusMsg.textContent = err.message;
+    }
+  });
 
   document.querySelectorAll('.tab').forEach(tabBtn => {
     tabBtn.addEventListener('click', () => {
@@ -482,30 +635,50 @@
       : `${allRegistrants.length} total`;
   }
 
-  async function tryLogin() {
-    const password = passwordInput.value;
-    if (!password) return;
-    gateSubmit.disabled = true;
-    gateError.classList.remove('show');
+  // role: 'master' (typed password) or 'invited' (token from an accepted invite link)
+  async function attemptLogin(key, role, opts) {
+    opts = opts || {};
+    if (!opts.silent) {
+      gateSubmit.disabled = true;
+      gateError.classList.remove('show');
+    }
     try {
-      await fetchRegistrants(password); // validates the password before switching views
-      currentPassword = password;
-      sessionStorage.setItem('p7AdminPassword', password); // stays only for this browser tab session
+      await fetchRegistrants(key); // validates the credential before switching views
+      currentKey = key;
+      currentRole = role;
+      if (role === 'master') {
+        sessionStorage.setItem('p7AdminPassword', key); // stays only for this browser tab session
+      } else {
+        localStorage.setItem('p7AdminToken', key); // persists so invited admins don't need the email link every time
+      }
       gate.style.display = 'none';
       dashboard.classList.add('show');
-      loadDashboard(currentPassword);
+      loadDashboard(currentKey);
     } catch (err) {
-      gateError.textContent = err.message;
-      gateError.classList.add('show');
+      if (err.removed) {
+        handleRemoved();
+        return;
+      }
+      if (!opts.silent) {
+        gateError.textContent = err.message;
+        gateError.classList.add('show');
+      } else if (role === 'invited') {
+        // A stored invite token that no longer validates (rejected/invalid) — clear it quietly.
+        localStorage.removeItem('p7AdminToken');
+      }
     } finally {
       gateSubmit.disabled = false;
     }
   }
 
-  gateSubmit.addEventListener('click', tryLogin);
-  passwordInput.addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
+  gateSubmit.addEventListener('click', () => {
+    const password = passwordInput.value;
+    if (!password) return;
+    attemptLogin(password, 'master');
+  });
+  passwordInput.addEventListener('keydown', e => { if (e.key === 'Enter') gateSubmit.click(); });
 
-  document.getElementById('refreshBtn').addEventListener('click', () => loadDashboard(currentPassword));
+  document.getElementById('refreshBtn').addEventListener('click', () => loadDashboard(currentKey));
 
   searchInput.addEventListener('input', applyFilters);
   skillFilter.addEventListener('change', applyFilters);
@@ -519,12 +692,15 @@
 
   document.getElementById('logoutBtn').addEventListener('click', () => {
     sessionStorage.removeItem('p7AdminPassword');
-    currentPassword = '';
+    localStorage.removeItem('p7AdminToken');
+    currentKey = '';
+    currentRole = '';
     allRegistrants = [];
     currentRegistrants = [];
     searchInput.value = '';
     skillFilter.value = '';
     zoneFilter.value = '';
+    adminsTabBtn.style.display = 'none';
     dashboard.classList.remove('show');
     gate.style.display = 'flex';
     passwordInput.value = '';
@@ -549,13 +725,18 @@
     link.click();
   });
 
-  // Re-check a session password on every page view, so the dashboard fetches fresh data
-  // each time it's opened rather than staying stuck on stale state.
+  // Re-check stored credentials on every page view, so the dashboard fetches fresh data
+  // each time it's opened rather than staying stuck on stale state. An invite token
+  // takes priority since that's how invited admins normally arrive here; if it's been
+  // removed, fetchRegistrants/attemptLogin will catch that and show the removed message.
   window.addEventListener('DOMContentLoaded', () => {
-    const saved = sessionStorage.getItem('p7AdminPassword');
-    if (saved) {
-      passwordInput.value = saved;
-      tryLogin();
+    const savedToken = localStorage.getItem('p7AdminToken');
+    const savedPassword = sessionStorage.getItem('p7AdminPassword');
+    if (savedToken) {
+      attemptLogin(savedToken, 'invited', { silent: true });
+    } else if (savedPassword) {
+      passwordInput.value = savedPassword;
+      attemptLogin(savedPassword, 'master', { silent: true });
     }
   });
 </script>

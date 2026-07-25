@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LP 7 Media Bootcamp — Admin Invite</title>
+<link rel="icon" type="image/jpeg" href="logo.jpg">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --black:#14100C; --orange:#F2650F; --orange-deep:#C8480A; --white:#FFFFFF;
+    --ash:#FAF9F6; --ink:#1B1710; --ink-soft:#6B6459; --line:#EDEAE2; --blue:#2E8FE0;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'Work Sans', sans-serif; color:var(--ink); background:var(--ash); min-height:100vh;}
+  .display{font-family:'Work Sans', Arial, Helvetica, sans-serif; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;}
+
+  #wrap{min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px;}
+  .card{
+    background:var(--white); border:1px solid var(--line); border-radius:18px; padding:34px 30px;
+    max-width:380px; width:100%; box-shadow:0 24px 60px rgba(20,16,12,0.10); text-align:center;
+  }
+  .brand{display:flex; flex-direction:column; align-items:center; gap:10px; margin-bottom:18px;}
+  .brand img{width:52px; height:52px; border-radius:50%; object-fit:cover; box-shadow:0 2px 8px rgba(0,0,0,0.18);}
+  .brand span{font-weight:800; font-size:12.5px; letter-spacing:0.4px; text-transform:uppercase; color:var(--ink-soft);}
+  h1{font-size:20px; margin:0 0 8px;}
+  p{font-size:13.5px; color:var(--ink-soft); line-height:1.6; margin:0 0 20px;}
+  .invited-email{font-weight:700; color:var(--ink);}
+  .btn-row{display:flex; gap:10px;}
+  button{
+    flex:1; border:none; border-radius:10px; padding:13px; font-family:'Work Sans', Arial, Helvetica, sans-serif;
+    font-weight:800; letter-spacing:0.6px; font-size:13px; text-transform:uppercase; cursor:pointer;
+  }
+  button:disabled{opacity:0.6; cursor:not-allowed;}
+  #acceptBtn{background:var(--orange); color:var(--white);}
+  #rejectBtn{background:var(--white); color:var(--ink); border:1.5px solid var(--line);}
+  .status-badge{
+    display:inline-block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px;
+    padding:4px 10px; border-radius:20px; margin-bottom:14px;
+  }
+  .status-accepted{background:#EAF6EC; color:#2E7D32;}
+  .status-rejected, .status-removed{background:#FDEDE8; color:var(--orange-deep);}
+  .status-pending{background:#FFF4EC; color:var(--orange-deep);}
+  .error-text{color:var(--orange-deep); font-size:13px; margin-top:10px;}
+  .goto-btn{
+    display:inline-block; margin-top:6px; width:100%; border:none; border-radius:10px; padding:13px;
+    background:var(--black); color:var(--white); font-family:'Work Sans', Arial, Helvetica, sans-serif;
+    font-weight:800; letter-spacing:0.6px; font-size:13px; text-transform:uppercase; text-decoration:none;
+    box-sizing:border-box;
+  }
+</style>
+</head>
+<body>
+
+<div id="wrap">
+  <div class="card">
+    <div class="brand">
+      <img src="logo.jpg" alt="LAPSETA logo">
+      <span>LAPSETA · Media Department</span>
+    </div>
+    <div id="content">
+      <p>Checking your invite…</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const content = document.getElementById('content');
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token') || '';
+
+  function render(html) {
+    content.innerHTML = html;
+  }
+
+  async function loadInvite() {
+    if (!token) {
+      render(`
+        <h1 class="display">Invalid Link</h1>
+        <p>This invite link is missing its token. Ask the main admin to resend your invite.</p>
+      `);
+      return;
+    }
+
+    let res, data;
+    try {
+      res = await fetch('/.netlify/functions/check-invite?token=' + encodeURIComponent(token));
+      data = await res.json();
+    } catch (err) {
+      render(`<h1 class="display">Something Went Wrong</h1><p>Could not reach the server. Please try again.</p>`);
+      return;
+    }
+
+    if (!res.ok) {
+      render(`<h1 class="display">Invalid Link</h1><p>${escapeHtml(data.error || 'This invite link is invalid.')}</p>`);
+      return;
+    }
+
+    renderForStatus(data.name, data.email, data.status);
+  }
+
+  function renderForStatus(name, email, status) {
+    const who = `<span class="invited-email">${escapeHtml(name)}</span> (${escapeHtml(email)}) as <span class="invited-email">Admin</span>`;
+
+    if (status === 'removed') {
+      render(`
+        <div class="status-badge status-removed">Access Removed</div>
+        <h1 class="display">You've Been Removed</h1>
+        <p>Your access to the admin dashboard has been removed by the main admin. Reach out to them if you think this is a mistake.</p>
+      `);
+      localStorage.removeItem('p7AdminToken');
+      return;
+    }
+
+    if (status === 'accepted') {
+      render(`
+        <div class="status-badge status-accepted">Accepted</div>
+        <h1 class="display">You're In</h1>
+        <p>You already accepted this invite as ${who}. Head to the dashboard below.</p>
+        <a class="goto-btn" href="admin.html">Open Dashboard</a>
+      `);
+      localStorage.setItem('p7AdminToken', token);
+      return;
+    }
+
+    if (status === 'rejected') {
+      render(`
+        <div class="status-badge status-rejected">Declined</div>
+        <h1 class="display">Invite Declined</h1>
+        <p>You previously declined this invite as ${who}. Changed your mind?</p>
+        <div class="btn-row">
+          <button id="acceptBtn">Accept</button>
+        </div>
+        <div class="error-text" id="respondError"></div>
+      `);
+      document.getElementById('acceptBtn').addEventListener('click', () => respond('accept'));
+      return;
+    }
+
+    // pending
+    render(`
+      <h1 class="display">You're Invited</h1>
+      <p>You've been invited to join the admin dashboard for Lagos as ${who}. Accept to get access, or decline if this isn't for you.</p>
+      <div class="btn-row">
+        <button id="rejectBtn">Decline</button>
+        <button id="acceptBtn">Accept</button>
+      </div>
+      <div class="error-text" id="respondError"></div>
+    `);
+    document.getElementById('acceptBtn').addEventListener('click', () => respond('accept'));
+    document.getElementById('rejectBtn').addEventListener('click', () => respond('reject'));
+  }
+
+  async function respond(action) {
+    const buttons = content.querySelectorAll('button');
+    buttons.forEach(b => b.disabled = true);
+
+    let res, data;
+    try {
+      res = await fetch('/.netlify/functions/respond-invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, action }),
+      });
+      data = await res.json();
+    } catch (err) {
+      const errEl = document.getElementById('respondError');
+      if (errEl) errEl.textContent = 'Could not reach the server. Please try again.';
+      buttons.forEach(b => b.disabled = false);
+      return;
+    }
+
+    if (!res.ok) {
+      render(`<h1 class="display">Something Went Wrong</h1><p>${escapeHtml(data.error || 'Could not update your invite.')}</p>`);
+      return;
+    }
+
+    if (action === 'accept') {
+      localStorage.setItem('p7AdminToken', token);
+      render(`
+        <div class="status-badge status-accepted">Accepted</div>
+        <h1 class="display">You're In</h1>
+        <p>You now have access to the admin dashboard.</p>
+        <a class="goto-btn" href="admin.html">Open Dashboard</a>
+      `);
+    } else {
+      render(`
+        <div class="status-badge status-rejected">Declined</div>
+        <h1 class="display">Invite Declined</h1>
+        <p>You've declined this invite. No access has been granted.</p>
+      `);
+    }
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  loadInvite();
+</script>
+
+</body>
+</html>
