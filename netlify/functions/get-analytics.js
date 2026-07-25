@@ -1,5 +1,5 @@
 const admin = require('firebase-admin');
-const { getFirestore } = require('firebase-admin/firestore');
+const { verifyAdminAccess, getDb } = require('./lib/auth');
 
 function getAdmin() {
   if (!admin.apps.length) {
@@ -11,19 +11,15 @@ function getAdmin() {
   return admin;
 }
 
-function getDb(fbAdmin) {
-  const databaseId = process.env.FIRESTORE_DATABASE_ID || '(default)';
-  return getFirestore(fbAdmin.app(), databaseId);
-}
-
 exports.handler = async function (event) {
-  const suppliedPassword = event.headers['x-admin-password'] || '';
+  const fbAdmin = getAdmin();
+  const access = await verifyAdminAccess(event, fbAdmin);
 
-  if (!process.env.ADMIN_DASHBOARD_PASSWORD || suppliedPassword !== process.env.ADMIN_DASHBOARD_PASSWORD) {
-    return { statusCode: 401, body: JSON.stringify({ error: 'Unauthorized' }) };
+  if (!access.ok) {
+    const message = access.error === 'removed' ? 'Your admin access has been removed.' : 'Unauthorized';
+    return { statusCode: access.statusCode, body: JSON.stringify({ error: message }) };
   }
 
-  const fbAdmin = getAdmin();
   const db = getDb(fbAdmin);
 
   try {
