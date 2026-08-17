@@ -125,6 +125,37 @@
   .empty-state{padding:50px 20px; text-align:center; color:var(--ink-soft); font-size:14px;}
   .loading-state{padding:50px 20px; text-align:center; color:var(--ink-soft); font-size:14px;}
 
+  /* ---- Broadcast ---- */
+  .broadcast-card{background:var(--white); border:1px solid var(--line); border-radius:14px; padding:20px; margin-bottom:18px;}
+  .field-label{font-size:11px; font-weight:700; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.4px; margin:0 0 8px;}
+  .target-pills{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;}
+  .target-pill{
+    border:1.5px solid var(--line); background:var(--ash); color:var(--ink); font-size:12.5px; font-weight:700;
+    padding:9px 16px; border-radius:20px; cursor:pointer; user-select:none;
+  }
+  .target-pill.active{background:var(--black); color:var(--white); border-color:var(--black);}
+  .bc-row{margin-bottom:16px;}
+  .bc-row select, .bc-row input[type="text"], .bc-row input[type="email"]{
+    width:100%; border:1.5px solid var(--line); border-radius:9px; padding:10px 12px;
+    font-size:13.5px; background:var(--ash); font-family:'Work Sans', sans-serif; color:var(--ink);
+  }
+  .bc-row textarea{
+    width:100%; border:1.5px solid var(--line); border-radius:9px; padding:10px 12px;
+    font-size:13.5px; background:var(--ash); font-family:'Work Sans', sans-serif; color:var(--ink);
+    min-height:140px; resize:vertical; line-height:1.5;
+  }
+  .bc-row select:focus, .bc-row input:focus, .bc-row textarea:focus{outline:none; border-color:var(--orange); background:var(--white);}
+  .bc-two-col{display:flex; gap:12px; flex-wrap:wrap;}
+  .bc-two-col > div{flex:1 1 220px;}
+  .bc-recipient-count{font-size:12.5px; color:var(--ink-soft); margin-top:6px;}
+  .bc-recipient-count strong{color:var(--orange-deep);}
+  .bc-footer{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-top:4px;}
+  .bc-status{font-size:12.5px; color:var(--ink-soft);}
+  .bc-status.error{color:#C8480A;}
+  .bc-status.success{color:#2E7D32;}
+  .section-heading{font-size:11px; font-weight:700; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.4px; margin:0 0 10px;}
+  .cell-message{max-width:260px; color:var(--ink-soft); font-size:12.5px; white-space:pre-wrap;}
+
   @media (max-width:640px){
     .dash-top{flex-direction:column; align-items:flex-start;}
     table{font-size:12px;}
@@ -171,6 +202,7 @@
     <button class="tab active" data-tab="registrants">Registrants</button>
     <button class="tab" data-tab="traffic">Traffic</button>
     <button class="tab" data-tab="admins" id="adminsTabBtn" style="display:none;">Admins</button>
+    <button class="tab" data-tab="broadcast" id="broadcastTabBtn" style="display:none;">Broadcast</button>
   </div>
 
   <div class="tab-panel active" id="panel-registrants">
@@ -252,6 +284,74 @@
       <div class="empty-state" id="invitesEmptyState" style="display:none;">No admins invited yet.</div>
     </div>
   </div>
+
+  <div class="tab-panel" id="panel-broadcast">
+    <div class="broadcast-card">
+      <div class="field-label">Send to</div>
+      <div class="target-pills">
+        <div class="target-pill active" data-target="all">All registrants</div>
+        <div class="target-pill" data-target="skill">By skill track</div>
+        <div class="target-pill" data-target="single">Single email</div>
+      </div>
+
+      <div class="bc-row" id="bcSkillRow" style="display:none;">
+        <div class="field-label">Skill track</div>
+        <select id="bcSkillSelect">
+          <option value="Smartphone Photography & Videography">Photography & Videography</option>
+          <option value="AI Animation & Video Editing">AI Animation & Video Editing</option>
+          <option value="Graphic Design">Graphic Design</option>
+          <option value="Web Development">Web Development</option>
+        </select>
+      </div>
+
+      <div class="bc-row bc-two-col" id="bcSingleRow" style="display:none;">
+        <div>
+          <div class="field-label">Name (if not already registered)</div>
+          <input type="text" id="bcSingleName" placeholder="Name…">
+        </div>
+        <div>
+          <div class="field-label">Email address</div>
+          <input type="email" id="bcSingleEmail" placeholder="someone@gmail.com">
+        </div>
+      </div>
+
+      <div class="bc-recipient-count" id="bcRecipientCount">Sending to <strong>0</strong> registrants.</div>
+
+      <div class="bc-row" style="margin-top:16px;">
+        <div class="field-label">Subject</div>
+        <input type="text" id="bcSubject" placeholder="e.g. Reminder: Day 2 starts tomorrow">
+      </div>
+
+      <div class="bc-row">
+        <div class="field-label">Message</div>
+        <textarea id="bcMessage" placeholder="Write your message here. Each person still gets it addressed to their own name and parish/zone."></textarea>
+      </div>
+
+      <div class="bc-footer">
+        <div class="bc-status" id="bcStatus"></div>
+        <button class="dash-btn primary" id="bcSendBtn">Send Broadcast</button>
+      </div>
+    </div>
+
+    <div class="section-heading">Recent broadcasts</div>
+    <div class="table-wrap">
+      <table id="broadcastsTable" style="display:none;">
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th>Sent to</th>
+            <th>Recipients</th>
+            <th>Sent</th>
+            <th>By</th>
+            <th>When</th>
+          </tr>
+        </thead>
+        <tbody id="broadcastsBody"></tbody>
+      </table>
+      <div class="loading-state" id="broadcastsLoadingState">Loading broadcast history…</div>
+      <div class="empty-state" id="broadcastsEmptyState" style="display:none;">No broadcasts sent yet.</div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -273,6 +373,7 @@
   const zoneFilter = document.getElementById('zoneFilter');
   const filterCount = document.getElementById('filterCount');
   const adminsTabBtn = document.getElementById('adminsTabBtn');
+  const broadcastTabBtn = document.getElementById('broadcastTabBtn');
 
   async function fetchRegistrants(key) {
     const res = await fetch('/.netlify/functions/get-registrants', {
@@ -484,9 +585,13 @@
 
     if (currentRole === 'master') {
       adminsTabBtn.style.display = '';
+      broadcastTabBtn.style.display = '';
       loadInvites();
+      loadBroadcasts();
+      updateRecipientCount();
     } else {
       adminsTabBtn.style.display = 'none';
+      broadcastTabBtn.style.display = 'none';
     }
   }
 
@@ -585,6 +690,146 @@
       loadInvites();
     } catch (err) {
       statusMsg.textContent = err.message;
+    }
+  });
+
+  // ---- Broadcast ----
+  let bcTarget = 'all';
+  const bcSkillRow = document.getElementById('bcSkillRow');
+  const bcSingleRow = document.getElementById('bcSingleRow');
+  const bcSkillSelect = document.getElementById('bcSkillSelect');
+  const bcSingleName = document.getElementById('bcSingleName');
+  const bcSingleEmail = document.getElementById('bcSingleEmail');
+  const bcSubject = document.getElementById('bcSubject');
+  const bcMessage = document.getElementById('bcMessage');
+  const bcStatus = document.getElementById('bcStatus');
+  const bcSendBtn = document.getElementById('bcSendBtn');
+  const bcRecipientCount = document.getElementById('bcRecipientCount');
+
+  function updateRecipientCount() {
+    if (bcTarget === 'single') {
+      bcRecipientCount.innerHTML = 'Sending to <strong>1</strong> person.';
+      return;
+    }
+    const count = bcTarget === 'all'
+      ? allRegistrants.length
+      : allRegistrants.filter(r => r.skill === bcSkillSelect.value).length;
+    const label = bcTarget === 'all' ? 'registrants' : 'people in this skill track';
+    bcRecipientCount.innerHTML = `Sending to <strong>${count}</strong> ${label}.`;
+  }
+
+  document.querySelectorAll('.target-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      document.querySelectorAll('.target-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      bcTarget = pill.dataset.target;
+      bcSkillRow.style.display = bcTarget === 'skill' ? 'block' : 'none';
+      bcSingleRow.style.display = bcTarget === 'single' ? 'flex' : 'none';
+      updateRecipientCount();
+    });
+  });
+  bcSkillSelect.addEventListener('change', updateRecipientCount);
+
+  async function loadBroadcasts() {
+    const table = document.getElementById('broadcastsTable');
+    const loading = document.getElementById('broadcastsLoadingState');
+    const empty = document.getElementById('broadcastsEmptyState');
+    loading.style.display = 'block';
+    table.style.display = 'none';
+    empty.style.display = 'none';
+    try {
+      const res = await fetch('/.netlify/functions/list-broadcasts', { headers: { 'x-admin-key': currentKey } });
+      if (!res.ok) throw new Error('Could not load broadcast history.');
+      const data = await res.json();
+      renderBroadcasts(data.broadcasts || []);
+    } catch (err) {
+      loading.textContent = err.message;
+    }
+  }
+
+  function targetLabel(b) {
+    if (b.target === 'all') return 'All registrants';
+    if (b.target === 'skill') return b.skill || 'Skill track';
+    if (b.target === 'single') return b.singleEmail || 'Single email';
+    return b.target;
+  }
+
+  function renderBroadcasts(broadcasts) {
+    const table = document.getElementById('broadcastsTable');
+    const loading = document.getElementById('broadcastsLoadingState');
+    const empty = document.getElementById('broadcastsEmptyState');
+    const tbody = document.getElementById('broadcastsBody');
+    loading.style.display = 'none';
+
+    if (!broadcasts.length) {
+      empty.style.display = 'block';
+      return;
+    }
+    table.style.display = 'table';
+    tbody.innerHTML = broadcasts.map(b => `
+      <tr>
+        <td class="cell-name">${escapeHtml(b.subject)}</td>
+        <td>${escapeHtml(targetLabel(b))}</td>
+        <td>${b.sentCount}/${b.recipientCount}</td>
+        <td>${b.sentCount >= b.recipientCount && b.recipientCount > 0 ? '<span class="status-tag status-accepted">Sent</span>' : '<span class="status-tag status-pending">Partial</span>'}</td>
+        <td>${escapeHtml(b.sentBy || '—')}</td>
+        <td>${b.createdAt ? new Date(b.createdAt).toLocaleString() : '—'}</td>
+      </tr>
+    `).join('');
+  }
+
+  bcSendBtn.addEventListener('click', async () => {
+    const subject = bcSubject.value.trim();
+    const message = bcMessage.value.trim();
+    if (!subject || !message) {
+      bcStatus.textContent = 'Please fill in both the subject and message.';
+      bcStatus.className = 'bc-status error';
+      return;
+    }
+    if (bcTarget === 'single' && !bcSingleEmail.value.trim()) {
+      bcStatus.textContent = 'Please enter an email address.';
+      bcStatus.className = 'bc-status error';
+      return;
+    }
+
+    const confirmLabel = bcTarget === 'all'
+      ? `all ${allRegistrants.length} registrants`
+      : bcTarget === 'skill'
+        ? `everyone in "${bcSkillSelect.value}"`
+        : `${bcSingleEmail.value.trim()}`;
+    if (!confirm(`Send this broadcast to ${confirmLabel}? This cannot be undone.`)) return;
+
+    bcSendBtn.disabled = true;
+    bcStatus.textContent = 'Sending…';
+    bcStatus.className = 'bc-status';
+
+    const payload = { target: bcTarget, subject, message };
+    if (bcTarget === 'skill') payload.skill = bcSkillSelect.value;
+    if (bcTarget === 'single') {
+      payload.singleEmail = bcSingleEmail.value.trim();
+      payload.singleName = bcSingleName.value.trim();
+    }
+
+    try {
+      const res = await fetch('/.netlify/functions/send-broadcast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-key': currentKey },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Could not send broadcast.');
+      bcStatus.textContent = `Sent to ${data.sentCount} of ${data.recipientCount} recipients.` + (data.errors && data.errors.length ? ' Some batches failed — check logs.' : '');
+      bcStatus.className = 'bc-status success';
+      bcSubject.value = '';
+      bcMessage.value = '';
+      bcSingleName.value = '';
+      bcSingleEmail.value = '';
+      loadBroadcasts();
+    } catch (err) {
+      bcStatus.textContent = err.message;
+      bcStatus.className = 'bc-status error';
+    } finally {
+      bcSendBtn.disabled = false;
     }
   });
 
@@ -701,6 +946,7 @@
     skillFilter.value = '';
     zoneFilter.value = '';
     adminsTabBtn.style.display = 'none';
+    broadcastTabBtn.style.display = 'none';
     dashboard.classList.remove('show');
     gate.style.display = 'flex';
     passwordInput.value = '';
