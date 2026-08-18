@@ -37,9 +37,6 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
-function textToHtml(str) {
-  return escapeHtml(str).replace(/\n/g, '<br>');
-}
 
 exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {
@@ -87,7 +84,9 @@ exports.handler = async function (event) {
   }
 
   const db = getDb(fbAdmin);
-  const messageHtml = textToHtml(message);
+  // Brevo escapes {{ params.MESSAGE }} itself when it renders the template,
+  // so we send the plain text as-is (no manual escaping/<br> conversion —
+  // that would get double-escaped). The template preserves line breaks via CSS.
 
   // Build the recipient list — always pulled fresh from Firestore server-side,
   // never trusted from the client.
@@ -142,7 +141,7 @@ exports.handler = async function (event) {
       ZONE: r.zone || '',
       SKILL: r.skill || '',
       TITLE: subject,
-      MESSAGE: messageHtml,
+      MESSAGE: message,
     },
   }));
 
@@ -162,7 +161,7 @@ exports.handler = async function (event) {
         body: JSON.stringify({
           templateId: Number(BROADCAST_TEMPLATE_ID),
           subject, // default/fallback subject; each version overrides via its own params/subject use in template
-          params: { TITLE: subject, MESSAGE: messageHtml }, // fallback if a version somehow lacks params
+          params: { TITLE: subject, MESSAGE: message }, // fallback if a version somehow lacks params
           messageVersions: chunk,
         }),
       });
