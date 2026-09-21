@@ -315,52 +315,53 @@
   .btn svg{width:18px; height:18px;}
   .fineprint{text-align:center; font-size:13px; color:var(--ink-soft); margin-top:16px; line-height:1.6;}
 
-  .success{display:none; padding:44px 28px 34px; text-align:center;}
+  /* ---------- SUCCESS SCREEN ---------- */
+  .success{display:none;}
   .success.show{display:block; animation:cardIn .5s cubic-bezier(.2,.8,.2,1);}
   @keyframes cardIn{from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:none;}}
-  .check-wrap{position:relative; width:84px; height:84px; margin:0 auto 24px;}
+  .card.done .modal-close{background:rgba(255,255,255,0.24);}
+  .card.done .modal-close svg{color:#fff;}
+  .card.done .modal-close:hover{background:rgba(255,255,255,0.38);}
+  .s-hero{
+    position:relative; overflow:hidden; text-align:center; color:#fff;
+    padding:62px 28px 40px; border-radius:0 0 var(--r-xl) var(--r-xl);
+    background:linear-gradient(140deg,#FFA51F 0%,#F4511E 50%,#C92A08 100%);
+  }
+  .s-hero::before{
+    content:''; position:absolute; left:50%; top:-40%; width:120%; aspect-ratio:1/1; transform:translateX(-50%);
+    border-radius:50%; background:radial-gradient(circle, rgba(255,224,130,0.6) 0%, rgba(255,224,130,0) 62%);
+  }
+  .s-hero > *{position:relative;}
+  .check-wrap{position:relative; width:72px; height:72px; margin:0 auto 18px;}
   .check-glow{
-    position:absolute; inset:-16px; border-radius:50%;
-    background:radial-gradient(circle, rgba(244,81,30,0.28) 0%, rgba(244,81,30,0) 70%);
+    position:absolute; inset:-14px; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%);
     animation:glowPulse 2.4s ease-in-out infinite;
   }
-  @keyframes glowPulse{0%,100%{transform:scale(0.94); opacity:0.7;} 50%{transform:scale(1.05); opacity:1;}}
+  @keyframes glowPulse{0%,100%{transform:scale(0.94); opacity:0.7;} 50%{transform:scale(1.08); opacity:1;}}
   .check{
-    position:relative; width:84px; height:84px; border-radius:50%;
-    background:var(--ember-strong);
+    position:relative; width:72px; height:72px; border-radius:50%; background:#fff;
     display:flex; align-items:center; justify-content:center;
+    box-shadow:0 10px 26px -8px rgba(90,20,0,0.5);
     animation:checkPop .5s cubic-bezier(.34,1.56,.64,1) .15s backwards;
   }
   @keyframes checkPop{0%{transform:scale(0.4); opacity:0;} 100%{transform:scale(1); opacity:1;}}
-  .check svg{width:36px; height:36px;}
+  .check svg{width:32px; height:32px;}
   .check svg path{stroke-dasharray:24; stroke-dashoffset:24; animation:drawCheck .4s ease-out .5s forwards;}
   @keyframes drawCheck{to{stroke-dashoffset:0;}}
-  .success h2{font-weight:700; font-size:25px; letter-spacing:-0.03em; margin:0 0 12px; color:var(--ink); max-width:none;}
-  .success p{color:var(--ink-soft); font-size:16px; line-height:1.65; max-width:330px; margin:0 auto 6px;}
-  .success .name{color:var(--ember-deep); font-weight:700;}
-  .whatsapp-cta{
-    display:flex; align-items:center; justify-content:center; gap:11px;
-    margin:26px auto 0; max-width:300px;
-    background:#1E8E3E; color:#fff; text-decoration:none; padding:15px 22px; border-radius:999px;
-    font-weight:700; font-size:15px; transition:background .15s ease;
-  }
-  .whatsapp-cta:hover{background:#166B2F;}
-  .whatsapp-cta .icon-badge{
-    width:26px; height:26px; border-radius:50%; background:rgba(255,255,255,0.22);
-    display:flex; align-items:center; justify-content:center; flex:0 0 auto;
-  }
-  .whatsapp-cta svg{width:15px; height:15px; flex:0 0 auto;}
-  .success .next{
-    margin-top:26px; text-align:left; background:var(--tonal); border-radius:var(--r-md);
-    padding:18px 20px; font-size:14px; color:var(--ink-soft);
-    display:flex; gap:12px; align-items:flex-start; line-height:1.6;
-  }
-  .success .next .info-icon{
-    width:20px; height:20px; border-radius:50%; background:var(--ember-strong); flex:0 0 auto;
-    display:flex; align-items:center; justify-content:center; margin-top:2px;
-  }
-  .success .next .info-icon svg{width:11px; height:11px;}
-  .success .next b{color:var(--ink); display:block; margin-bottom:4px; font-size:15px; font-weight:700;}
+  .s-hero h2{font-weight:700; font-size:28px; letter-spacing:-0.03em; line-height:1.1; margin:0 0 8px; color:#fff; max-width:none;}
+  .s-hero p{font-size:15px; line-height:1.55; color:rgba(255,255,255,0.94); max-width:300px; margin:0 auto;}
+  .s-hero .name{font-weight:700;}
+  .s-body{padding:20px 24px 28px;}
+  .ticket{background:var(--tonal); border-radius:var(--r-lg); overflow:hidden;}
+  .t-row{display:flex; gap:14px; justify-content:space-between; align-items:baseline; padding:13px 18px;}
+  .t-row + .t-row{border-top:1.5px dashed rgba(209,59,8,0.22);}
+  .t-row .l{font-size:13px; font-weight:600; color:var(--ink-soft); flex:0 0 auto;}
+  .t-row .v{font-size:14.5px; font-weight:600; color:var(--ink); text-align:right; line-height:1.4;}
+  .t-row .v small{display:block; font-weight:500; font-size:13px; color:var(--ink-soft);}
+  .s-note{margin:14px 2px 0; font-size:13.5px; line-height:1.55; color:var(--ink-soft); text-align:center;}
+  .s-actions{display:flex; flex-direction:column; gap:8px; margin-top:18px;}
+  .s-actions .btn-pill{width:100%; padding:13px 20px;}
 
   /* ---------- FOOTER ---------- */
   footer{border-top:1px solid var(--line); color:var(--ink-soft); padding:30px 0 20px;}
@@ -635,30 +636,28 @@
     </div>
 
     <div class="success" id="successPanel">
-      <div class="check-wrap">
-        <div class="check-glow"></div>
-        <div class="check">
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+      <div class="s-hero">
+        <div class="check-wrap">
+          <div class="check-glow"></div>
+          <div class="check">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#D13B08" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+          </div>
         </div>
+        <h2>You're in, <span class="name" id="successName">friend</span>.</h2>
+        <p>Your spot at PYLR 2026: Forged is saved. See you there.</p>
       </div>
-      <h2>You're in!</h2>
-      <p>Thanks for registering, <span class="name" id="successName">friend</span>. We've saved your spot for PYLR 2026 — Forged.</p>
-
-      <a href="https://whatsapp.com/channel/0029Vb6o8JiADTODuIXY4Q15" target="_blank" rel="noopener" class="whatsapp-cta">
-        <span class="icon-badge">
-          <svg viewBox="0 0 24 24" fill="white"><path d="M17.47 14.38c-.29-.15-1.7-.84-1.97-.93-.26-.1-.46-.15-.65.14-.2.3-.75.94-.92 1.13-.17.2-.34.22-.63.08-.3-.15-1.24-.46-2.36-1.46-.87-.78-1.46-1.74-1.63-2.03-.17-.3-.02-.46.13-.6.13-.13.3-.34.44-.51.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.51-.08-.15-.65-1.58-.9-2.16-.24-.58-.48-.5-.65-.5-.17 0-.37-.02-.56-.02s-.51.08-.78.37c-.26.3-1.02 1-1.02 2.42 0 1.43 1.05 2.82 1.19 3.01.15.2 2.06 3.14 5 4.4.7.3 1.24.48 1.67.62.7.22 1.34.19 1.84.12.56-.08 1.7-.7 1.94-1.36.24-.67.24-1.24.17-1.36-.07-.12-.26-.2-.55-.34z"/><path d="M20.52 3.45A11.86 11.86 0 0 0 12.02 0C5.5 0 .2 5.28.2 11.78c0 2.08.55 4.1 1.58 5.9L0 24l6.5-1.7a11.8 11.8 0 0 0 5.5 1.4h.01c6.51 0 11.8-5.28 11.8-11.78 0-3.15-1.22-6.1-3.4-8.32zM12.02 21.6h-.01a9.8 9.8 0 0 1-5-1.36l-.36-.21-3.86 1 1.03-3.76-.24-.39a9.8 9.8 0 0 1-1.5-5.2c0-5.42 4.42-9.83 9.85-9.83 2.63 0 5.1 1.03 6.96 2.88a9.75 9.75 0 0 1 2.88 6.95c0 5.42-4.42 9.92-9.85 9.92z"/></svg>
-        </span>
-        <span>Join Our WhatsApp Channel</span>
-      </a>
-
-      <div class="next">
-        <span class="info-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 8v.01M12 11v5"/></svg>
-        </span>
-        <span>
-          <b>What happens next</b>
-          A confirmation email is on its way to your inbox. Remember to bring your ₦1,000 registration fee to the venue — see you 3rd October, 9AM prompt at RCCG Fruitful Vine, Ikotun!
-        </span>
+      <div class="s-body">
+        <div class="ticket">
+          <div class="t-row"><span class="l">Date</span><span class="v">Saturday 3 October 2026</span></div>
+          <div class="t-row"><span class="l">Time</span><span class="v">9:00 AM prompt</span></div>
+          <div class="t-row"><span class="l">Venue</span><span class="v">RCCG Fruitful Vine<small>6&ndash;7 Ishmaila Ajibade, Nobex, Ikotun, Lagos</small></span></div>
+          <div class="t-row"><span class="l">Bring</span><span class="v">&#8358;1,000 registration fee<small>Paid at the venue</small></span></div>
+        </div>
+        <p class="s-note">A confirmation email is on its way to your Gmail. If you don't see it, check your spam folder.</p>
+        <div class="s-actions">
+          <a class="btn-pill btn-fill" href="https://www.google.com/maps/search/?api=1&amp;query=RCCG+Fruitful+Vine+Ishmaila+Ajibade+Ikotun+Lagos" target="_blank" rel="noopener">Get directions</a>
+          <button type="button" class="btn-pill btn-tonal" onclick="closeModal()">Done</button>
+        </div>
       </div>
     </div>
   </div>
@@ -855,6 +854,8 @@
       const name = payload.fullName.split(' ')[0] || 'friend';
       document.getElementById('successName').textContent = name;
       document.getElementById('formPanel').style.display = 'none';
+      document.querySelector('#registerModal .card-top').style.display = 'none';
+      document.querySelector('#registerModal .card').classList.add('done');
       document.getElementById('successPanel').classList.add('show');
     } catch (err) {
       submitError.textContent = err.message || 'Something went wrong. Please try again.';
