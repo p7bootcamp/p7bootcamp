@@ -20,8 +20,10 @@ function getDb(fbAdmin) {
   return getFirestore(fbAdmin.app(), databaseId);
 }
 
-// Single confirmation template for every PYLR registrant (set this in Netlify env vars).
-const CONFIRMATION_TEMPLATE_ID = process.env.BREVO_TEMPLATE_PYLR;
+// Brevo template 7 is the confirmation email every PYLR registrant gets, sent the
+// moment their registration is saved. Fixed on purpose (no env override) so an old
+// template ID left in Netlify can never send the wrong email.
+const CONFIRMATION_TEMPLATE_ID = 7;
 
 const GMAIL_PATTERN = /^[A-Za-z0-9._%+-]+@gmail\.com$/;
 
@@ -91,9 +93,9 @@ exports.handler = async function (event) {
     return { statusCode: 500, body: JSON.stringify({ error: 'Could not save your registration. Please try again.' }) };
   }
 
-  // Send the confirmation email — this failing should not undo the registration above
+  // Send the confirmation email immediately — this failing should not undo the registration above
   let emailSent = false;
-  if (CONFIRMATION_TEMPLATE_ID) {
+  {
     try {
       const res = await fetch('https://api.brevo.com/v3/smtp/email', {
         method: 'POST',
@@ -104,7 +106,7 @@ exports.handler = async function (event) {
         },
         body: JSON.stringify({
           to: [{ email, name: fullName }],
-          templateId: Number(CONFIRMATION_TEMPLATE_ID),
+          templateId: CONFIRMATION_TEMPLATE_ID,
           params: {
             FULLNAME: fullName,
             FIRSTNAME: fullName.split(' ')[0],
