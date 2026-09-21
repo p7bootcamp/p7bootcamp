@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LP 7 Media Bootcamp — Admin</title>
+<title>PYLR 2026 — Admin</title>
 <link rel="icon" type="image/jpeg" href="logo.jpg">
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -172,7 +172,7 @@
   <div class="gate-card">
     <div class="gate-brand">
       <img src="logo.jpg" alt="RCCG logo">
-      <span>LAPSETA · Media Department</span>
+      <span>LAPSETA · PYLR 2026</span>
     </div>
     <h1 class="display">Admin Access</h1>
     <p id="gateCopy">Enter the dashboard password to view registrants. Invited admins should use the link from their invite email instead.</p>
@@ -187,7 +187,7 @@
     <div class="brand-mark">
       <img src="logo.jpg" alt="RCCG logo">
       <div class="brand-text">
-        <div class="n">LP 7 Bootcamp Registrants</div>
+        <div class="n">PYLR 2026 Registrants</div>
         <div class="s" id="lastUpdated">Loading…</div>
       </div>
     </div>
@@ -208,13 +208,6 @@
   <div class="tab-panel active" id="panel-registrants">
     <div class="filter-bar">
       <input type="text" id="searchInput" placeholder="Search name or email…">
-      <select id="skillFilter">
-        <option value="">All skills</option>
-        <option value="Smartphone Photography & Videography">Photography & Videography</option>
-        <option value="AI Animation & Video Editing">AI Animation & Video Editing</option>
-        <option value="Graphic Design">Graphic Design</option>
-        <option value="Web Development">Web Development</option>
-      </select>
       <select id="zoneFilter">
         <option value="">All parishes</option>
       </select>
@@ -232,7 +225,6 @@
             <th>Email</th>
             <th>Parish</th>
             <th>Age</th>
-            <th>Skill</th>
             <th>Expectation</th>
             <th>Registered</th>
           </tr>
@@ -290,18 +282,13 @@
       <div class="field-label">Send to</div>
       <div class="target-pills">
         <div class="target-pill active" data-target="all">All registrants</div>
-        <div class="target-pill" data-target="skill">By skill track</div>
+        <div class="target-pill" data-target="zone">By parish</div>
         <div class="target-pill" data-target="single">Single email</div>
       </div>
 
-      <div class="bc-row" id="bcSkillRow" style="display:none;">
-        <div class="field-label">Skill track</div>
-        <select id="bcSkillSelect">
-          <option value="Smartphone Photography & Videography">Photography & Videography</option>
-          <option value="AI Animation & Video Editing">AI Animation & Video Editing</option>
-          <option value="Graphic Design">Graphic Design</option>
-          <option value="Web Development">Web Development</option>
-        </select>
+      <div class="bc-row" id="bcZoneRow" style="display:none;">
+        <div class="field-label">Parish</div>
+        <select id="bcZoneSelect"></select>
       </div>
 
       <div class="bc-row bc-two-col" id="bcSingleRow" style="display:none;">
@@ -369,7 +356,6 @@
   const gateError = document.getElementById('gateError');
   const gateSubmit = document.getElementById('gateSubmit');
   const searchInput = document.getElementById('searchInput');
-  const skillFilter = document.getElementById('skillFilter');
   const zoneFilter = document.getElementById('zoneFilter');
   const filterCount = document.getElementById('filterCount');
   const adminsTabBtn = document.getElementById('adminsTabBtn');
@@ -507,13 +493,14 @@
   }
 
   function renderStats(list) {
-    const bySkill = {};
-    list.forEach(r => { bySkill[r.skill] = (bySkill[r.skill] || 0) + 1; });
+    const byZone = {};
+    list.forEach(r => { const z = (r.zone || '').trim() || 'Unspecified'; byZone[z] = (byZone[z] || 0) + 1; });
+    const topZones = Object.entries(byZone).sort((a, b) => b[1] - a[1]).slice(0, 4);
     const statsRow = document.getElementById('statsRow');
     statsRow.innerHTML = `
       <div class="stat-card"><div class="n">${list.length}</div><div class="l">Total registered</div></div>
-      ${Object.entries(bySkill).map(([skill, count]) => `
-        <div class="stat-card"><div class="n">${count}</div><div class="l">${skill.split(' ')[0]}</div></div>
+      ${topZones.map(([zone, count]) => `
+        <div class="stat-card"><div class="n">${count}</div><div class="l">${zone}</div></div>
       `).join('')}
     `;
   }
@@ -527,7 +514,7 @@
 
     if (list.length === 0) {
       table.style.display = 'none';
-      const filtersActive = searchInput.value.trim() || skillFilter.value || zoneFilter.value;
+      const filtersActive = searchInput.value.trim() || zoneFilter.value;
       empty.textContent = filtersActive ? 'No registrants match these filters.' : 'No registrations yet.';
       empty.style.display = 'block';
       return;
@@ -540,7 +527,6 @@
         <td>${escapeHtml(r.email)}</td>
         <td>${escapeHtml(r.zone)}</td>
         <td>${escapeHtml(String(r.age))}</td>
-        <td><span class="skill-tag">${escapeHtml(r.skill)}</span></td>
         <td class="cell-expect">${escapeHtml(r.expectation || '—')}</td>
         <td>${r.createdAt ? new Date(r.createdAt).toLocaleString() : '—'}</td>
       </tr>
@@ -695,9 +681,9 @@
 
   // ---- Broadcast ----
   let bcTarget = 'all';
-  const bcSkillRow = document.getElementById('bcSkillRow');
+  const bcZoneRow = document.getElementById('bcZoneRow');
   const bcSingleRow = document.getElementById('bcSingleRow');
-  const bcSkillSelect = document.getElementById('bcSkillSelect');
+  const bcZoneSelect = document.getElementById('bcZoneSelect');
   const bcSingleName = document.getElementById('bcSingleName');
   const bcSingleEmail = document.getElementById('bcSingleEmail');
   const bcSubject = document.getElementById('bcSubject');
@@ -713,8 +699,8 @@
     }
     const count = bcTarget === 'all'
       ? allRegistrants.length
-      : allRegistrants.filter(r => r.skill === bcSkillSelect.value).length;
-    const label = bcTarget === 'all' ? 'registrants' : 'people in this skill track';
+      : allRegistrants.filter(r => (r.zone || '').trim() === bcZoneSelect.value).length;
+    const label = bcTarget === 'all' ? 'registrants' : 'people in this parish';
     bcRecipientCount.innerHTML = `Sending to <strong>${count}</strong> ${label}.`;
   }
 
@@ -723,12 +709,12 @@
       document.querySelectorAll('.target-pill').forEach(p => p.classList.remove('active'));
       pill.classList.add('active');
       bcTarget = pill.dataset.target;
-      bcSkillRow.style.display = bcTarget === 'skill' ? 'block' : 'none';
+      bcZoneRow.style.display = bcTarget === 'zone' ? 'block' : 'none';
       bcSingleRow.style.display = bcTarget === 'single' ? 'flex' : 'none';
       updateRecipientCount();
     });
   });
-  bcSkillSelect.addEventListener('change', updateRecipientCount);
+  bcZoneSelect.addEventListener('change', updateRecipientCount);
 
   async function loadBroadcasts() {
     const table = document.getElementById('broadcastsTable');
@@ -749,7 +735,7 @@
 
   function targetLabel(b) {
     if (b.target === 'all') return 'All registrants';
-    if (b.target === 'skill') return b.skill || 'Skill track';
+    if (b.target === 'zone') return b.zone || 'Parish';
     if (b.target === 'single') return b.singleEmail || 'Single email';
     return b.target;
   }
@@ -794,8 +780,8 @@
 
     const confirmLabel = bcTarget === 'all'
       ? `all ${allRegistrants.length} registrants`
-      : bcTarget === 'skill'
-        ? `everyone in "${bcSkillSelect.value}"`
+      : bcTarget === 'zone'
+        ? `everyone in "${bcZoneSelect.value}"`
         : `${bcSingleEmail.value.trim()}`;
     if (!confirm(`Send this broadcast to ${confirmLabel}? This cannot be undone.`)) return;
 
@@ -804,7 +790,7 @@
     bcStatus.className = 'bc-status';
 
     const payload = { target: bcTarget, subject, message };
-    if (bcTarget === 'skill') payload.skill = bcSkillSelect.value;
+    if (bcTarget === 'zone') payload.zone = bcZoneSelect.value;
     if (bcTarget === 'single') {
       payload.singleEmail = bcSingleEmail.value.trim();
       payload.singleName = bcSingleName.value.trim();
@@ -855,26 +841,31 @@
     zoneFilter.innerHTML = '<option value="">All parishes</option>' +
       zones.map(z => `<option value="${escapeHtml(z)}">${escapeHtml(z)}</option>`).join('');
     if (zones.includes(selected)) zoneFilter.value = selected;
+
+    const bcZoneSelect = document.getElementById('bcZoneSelect');
+    if (bcZoneSelect) {
+      const bcSelected = bcZoneSelect.value;
+      bcZoneSelect.innerHTML = zones.map(z => `<option value="${escapeHtml(z)}">${escapeHtml(z)}</option>`).join('');
+      if (zones.includes(bcSelected)) bcZoneSelect.value = bcSelected;
+    }
   }
 
   function applyFilters() {
     const q = searchInput.value.trim().toLowerCase();
-    const skill = skillFilter.value;
     const zone = zoneFilter.value;
 
     currentRegistrants = allRegistrants.filter(r => {
       const matchesSearch = !q ||
         (r.fullName || '').toLowerCase().includes(q) ||
         (r.email || '').toLowerCase().includes(q);
-      const matchesSkill = !skill || r.skill === skill;
       const matchesZone = !zone || (r.zone || '').trim() === zone;
-      return matchesSearch && matchesSkill && matchesZone;
+      return matchesSearch && matchesZone;
     });
 
     renderStats(currentRegistrants);
     renderTable(currentRegistrants);
 
-    const anyFilterActive = q || skill || zone;
+    const anyFilterActive = q || zone;
     filterCount.textContent = anyFilterActive
       ? `Showing ${currentRegistrants.length} of ${allRegistrants.length}`
       : `${allRegistrants.length} total`;
@@ -926,11 +917,9 @@
   document.getElementById('refreshBtn').addEventListener('click', () => loadDashboard(currentKey));
 
   searchInput.addEventListener('input', applyFilters);
-  skillFilter.addEventListener('change', applyFilters);
   zoneFilter.addEventListener('change', applyFilters);
   document.getElementById('clearFiltersBtn').addEventListener('click', () => {
     searchInput.value = '';
-    skillFilter.value = '';
     zoneFilter.value = '';
     applyFilters();
   });
@@ -943,7 +932,6 @@
     allRegistrants = [];
     currentRegistrants = [];
     searchInput.value = '';
-    skillFilter.value = '';
     zoneFilter.value = '';
     adminsTabBtn.style.display = 'none';
     broadcastTabBtn.style.display = 'none';
@@ -955,9 +943,9 @@
 
   document.getElementById('exportBtn').addEventListener('click', () => {
     if (!currentRegistrants.length) return;
-    const headers = ['Full Name', 'Email', 'Parish', 'Age', 'Skill', 'Expectation', 'Registered'];
+    const headers = ['Full Name', 'Email', 'Parish', 'Age', 'Expectation', 'Registered'];
     const rows = currentRegistrants.map(r => [
-      r.fullName, r.email, r.zone, r.age, r.skill,
+      r.fullName, r.email, r.zone, r.age,
       (r.expectation || '').replace(/"/g, '""'),
       r.createdAt ? new Date(r.createdAt).toLocaleString() : '',
     ]);
@@ -967,7 +955,7 @@
     const blob = new Blob([csv], { type: 'text/csv' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = 'p7-media-bootcamp-registrants.csv';
+    link.download = 'pylr-2026-registrants.csv';
     link.click();
   });
 
