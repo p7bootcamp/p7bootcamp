@@ -20,13 +20,8 @@ function getDb(fbAdmin) {
   return getFirestore(fbAdmin.app(), databaseId);
 }
 
-// Maps each of the four selectable skills to its own Brevo template ID (set these in Netlify env vars)
-const TEMPLATE_MAP = {
-  'Smartphone Photography & Videography': process.env.BREVO_TEMPLATE_PHOTOGRAPHY,
-  'AI Animation & Video Editing': process.env.BREVO_TEMPLATE_AI_ANIMATION,
-  'Graphic Design': process.env.BREVO_TEMPLATE_GRAPHIC_DESIGN,
-  'Web Development': process.env.BREVO_TEMPLATE_WEB_DEV,
-};
+// Single confirmation template for every PYLR registrant (set this in Netlify env vars).
+const CONFIRMATION_TEMPLATE_ID = process.env.BREVO_TEMPLATE_PYLR;
 
 const GMAIL_PATTERN = /^[A-Za-z0-9._%+-]+@gmail\.com$/;
 
@@ -46,7 +41,6 @@ exports.handler = async function (event) {
   const email = (data.email || '').trim().toLowerCase();
   const zone = (data.zone || '').trim();
   const age = Number(data.age);
-  const skill = (data.skill || '').trim();
   const expectation = (data.expectation || '').trim();
 
   // Server-side validation — never trust the client alone
@@ -62,9 +56,6 @@ exports.handler = async function (event) {
   if (!age || age < 10 || age > 25) {
     return { statusCode: 400, body: JSON.stringify({ error: 'Age must be between 10 and 25.' }) };
   }
-  if (!TEMPLATE_MAP[skill]) {
-    return { statusCode: 400, body: JSON.stringify({ error: 'Please select a valid skill.' }) };
-  }
   if (expectation.length > 280) {
     return { statusCode: 400, body: JSON.stringify({ error: 'That message is too long.' }) };
   }
@@ -77,7 +68,7 @@ exports.handler = async function (event) {
   try {
     const existing = await db.collection('registrations').where('email', '==', email).limit(1).get();
     if (!existing.empty) {
-      return { statusCode: 409, body: JSON.stringify({ error: 'This email has already registered for the bootcamp.' }) };
+      return { statusCode: 409, body: JSON.stringify({ error: 'This email has already registered for PYLR 2026.' }) };
     }
   } catch (err) {
     console.error('Duplicate check failed:', err);
@@ -92,7 +83,6 @@ exports.handler = async function (event) {
       email,
       zone,
       age,
-      skill,
       expectation,
       createdAt: fbAdmin.firestore.FieldValue.serverTimestamp(),
     });
@@ -103,29 +93,30 @@ exports.handler = async function (event) {
 
   // Send the confirmation email — this failing should not undo the registration above
   let emailSent = false;
-  try {
-    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
-      method: 'POST',
-      headers: {
-        'api-key': process.env.BREVO_API_KEY,
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify({
-        to: [{ email, name: fullName }],
-        templateId: Number(TEMPLATE_MAP[skill]),
-        params: {
-          FULLNAME: fullName,
-          FIRSTNAME: fullName.split(' ')[0],
-          SKILL: skill,
-          ZONE: zone,
+  if (CONFIRMATION_TEMPLATE_ID) {
+    try {
+      const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'api-key': process.env.BREVO_API_KEY,
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
         },
-      }),
-    });
-    emailSent = res.ok;
-    if (!res.ok) console.error('Brevo error:', res.status, await res.text());
-  } catch (err) {
-    console.error('Brevo request failed:', err);
+        body: JSON.stringify({
+          to: [{ email, name: fullName }],
+          templateId: Number(CONFIRMATION_TEMPLATE_ID),
+          params: {
+            FULLNAME: fullName,
+            FIRSTNAME: fullName.split(' ')[0],
+            ZONE: zone,
+          },
+        }),
+      });
+      emailSent = res.ok;
+      if (!res.ok) console.error('Brevo error:', res.status, await res.text());
+    } catch (err) {
+      console.error('Brevo request failed:', err);
+    }
   }
 
   return {

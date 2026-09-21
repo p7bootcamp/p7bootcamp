@@ -27,7 +27,7 @@ exports.handler = async function (event) {
       return {
         id: doc.id,
         target: d.target || '',
-        skill: d.skill || null,
+        zone: d.zone || null,
         singleEmail: d.singleEmail || null,
         subject: d.subject || '',
         message: d.message || '',

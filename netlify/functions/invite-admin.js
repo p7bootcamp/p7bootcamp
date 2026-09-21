@@ -14,7 +14,7 @@ function getAdmin() {
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Same Brevo template pattern as the 4 bootcamp confirmation emails in register.js —
+// Same Brevo template pattern as the confirmation email in register.js —
 // set BREVO_TEMPLATE_ADMIN_INVITE in Netlify if you ever want to swap the template later.
 const ADMIN_INVITE_TEMPLATE_ID = process.env.BREVO_TEMPLATE_ADMIN_INVITE || 5;
 

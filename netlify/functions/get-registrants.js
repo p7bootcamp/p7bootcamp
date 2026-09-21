@@ -32,7 +32,6 @@ exports.handler = async function (event) {
         email: d.email || '',
         zone: d.zone || '',
         age: d.age || '',
-        skill: d.skill || '',
         expectation: d.expectation || '',
         createdAt: d.createdAt && d.createdAt.toDate ? d.createdAt.toDate().toISOString() : null,
       };

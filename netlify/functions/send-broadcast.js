@@ -17,12 +17,6 @@ function getAdmin() {
 const BROADCAST_TEMPLATE_ID = process.env.BREVO_TEMPLATE_BROADCAST || 6;
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const VALID_SKILLS = [
-  'Smartphone Photography & Videography',
-  'AI Animation & Video Editing',
-  'Graphic Design',
-  'Web Development',
-];
 
 // Brevo's messageVersions cap: up to 1000 personalized versions per API call.
 // One recipient per version (so each person gets their own name/zone), chunked
@@ -60,18 +54,18 @@ exports.handler = async function (event) {
     return { statusCode: 400, body: JSON.stringify({ error: 'Invalid request body' }) };
   }
 
-  const target = (data.target || '').trim(); // 'all' | 'skill' | 'single'
-  const skill = (data.skill || '').trim();
+  const target = (data.target || '').trim(); // 'all' | 'zone' | 'single'
+  const zone = (data.zone || '').trim();
   const subject = (data.subject || '').trim();
   const message = (data.message || '').trim();
   const singleName = (data.singleName || '').trim();
   const singleEmail = (data.singleEmail || '').trim().toLowerCase();
 
-  if (!['all', 'skill', 'single'].includes(target)) {
+  if (!['all', 'zone', 'single'].includes(target)) {
     return { statusCode: 400, body: JSON.stringify({ error: 'Invalid target.' }) };
   }
-  if (target === 'skill' && !VALID_SKILLS.includes(skill)) {
-    return { statusCode: 400, body: JSON.stringify({ error: 'Please select a valid skill.' }) };
+  if (target === 'zone' && !zone) {
+    return { statusCode: 400, body: JSON.stringify({ error: 'Please select a parish.' }) };
   }
   if (target === 'single' && !EMAIL_PATTERN.test(singleEmail)) {
     return { statusCode: 400, body: JSON.stringify({ error: 'Please enter a valid email address.' }) };
@@ -95,12 +89,12 @@ exports.handler = async function (event) {
     if (target === 'all') {
       const snap = await db.collection('registrations').get();
       recipients = snap.docs.map((doc) => doc.data());
-    } else if (target === 'skill') {
-      const snap = await db.collection('registrations').where('skill', '==', skill).get();
+    } else if (target === 'zone') {
+      const snap = await db.collection('registrations').where('zone', '==', zone).get();
       recipients = snap.docs.map((doc) => doc.data());
     } else {
       // Single email — if it matches an existing registrant, pull their real
-      // name/zone/skill so the message is still personalized; otherwise fall
+      // name/zone so the message is still personalized; otherwise fall
       // back to whatever name the admin typed in.
       const existing = await db.collection('registrations').where('email', '==', singleEmail).limit(1).get();
       if (!existing.empty) {
@@ -110,7 +104,6 @@ exports.handler = async function (event) {
           fullName: singleName || singleEmail.split('@')[0],
           email: singleEmail,
           zone: '',
-          skill: '',
         }];
       }
     }
@@ -139,7 +132,6 @@ exports.handler = async function (event) {
       FULLNAME: r.fullName || '',
       FIRSTNAME: (r.fullName || '').split(' ')[0] || '',
       ZONE: r.zone || '',
-      SKILL: r.skill || '',
       TITLE: subject,
       MESSAGE: message,
     },
@@ -182,7 +174,7 @@ exports.handler = async function (event) {
   try {
     await db.collection('broadcasts').add({
       target,
-      skill: target === 'skill' ? skill : null,
+      zone: target === 'zone' ? zone : null,
       singleEmail: target === 'single' ? singleEmail : null,
       subject,
       message,
