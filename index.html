@@ -384,6 +384,11 @@
   .social-icon:hover{background:var(--tonal-deep);}
   .footer-bottom{padding-top:20px; font-size:13px; color:var(--ink-soft); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;}
 
+  /* ---------- MOBILE OVERFLOW FIX ---------- */
+  html, body{overflow-x:hidden; max-width:100%;}
+  body{overflow-x:clip;}
+  .hero{overflow-x:clip;}
+
   /* ---------- RESPONSIVE ---------- */
   @media (max-width:900px){
     .hero{grid-template-columns:1fr; gap:36px; padding-top:24px;}
