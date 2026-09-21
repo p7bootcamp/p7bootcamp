@@ -618,7 +618,7 @@
           </div>
           <div class="field">
             <label>Anything you'd like us to know? <span class="optional">(optional)</span></label>
-            <textarea id="expect" maxlength="280" placeholder="Any prayer point or note for the team..."></textarea>
+            <textarea id="expectation" maxlength="280" placeholder="Any prayer point or note for the team..."></textarea>
             <div class="field-counter" id="expectCounter">0 / 280 characters</div>
             <div class="field-error" id="expectError">Please write a real sentence, not one long word or repeated characters.</div>
           </div>
@@ -718,7 +718,7 @@
     if (e.key === 'Escape') closeModal();
   });
 
-  const expectField = document.getElementById('expect');
+  const expectField = document.getElementById('expectation');
   const expectCounter = document.getElementById('expectCounter');
   const expectError = document.getElementById('expectError');
   const MAX_CHARS = 280;
