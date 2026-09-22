@@ -7,17 +7,17 @@
 <link rel="icon" type="image/jpeg" href="logo.jpg">
 <link rel="apple-touch-icon" href="logo.jpg">
 <meta name="theme-color" content="#FFFFFF">
-<meta name="description" content="PYLR 2026 — Forged. RCCG Directorate of Teens and Children Education, Lagos Province Seven Teens Affairs. 3rd October 2026, 9AM prompt, RCCG Fruitful Vine, Ikotun, Lagos. Registration is compulsory — ₦1,000. Register now.">
+<meta name="description" content="PYLR 2026 — Forged. RCCG Directorate of Teens and Children Education, Lagos Province Seven Teens Affairs. 3rd October 2026, 9AM prompt, RCCG Fruitful Vine, Ikotun, Lagos. Registration is compulsory — ₦1,000, paid via Moniepoint. Register now.">
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="PYLR 2026 — Forged">
-<meta property="og:description" content="RCCG Directorate of Teens and Children Education, Lagos Province Seven Teens Affairs. 3rd October 2026, 9AM prompt, RCCG Fruitful Vine, Ikotun, Lagos. Registration is compulsory — ₦1,000.">
+<meta property="og:description" content="RCCG Directorate of Teens and Children Education, Lagos Province Seven Teens Affairs. 3rd October 2026, 9AM prompt, RCCG Fruitful Vine, Ikotun, Lagos. Registration is compulsory — ₦1,000, paid via Moniepoint.">
 <meta property="og:image" content="https://lp7mediabootcamp.netlify.app/flyer.jpg">
 <meta property="og:url" content="https://lp7mediabootcamp.netlify.app/">
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="PYLR 2026 — Forged">
-<meta name="twitter:description" content="3rd October 2026, 9AM prompt, RCCG Fruitful Vine, Ikotun, Lagos. Registration is compulsory — ₦1,000. Register now.">
+<meta name="twitter:description" content="3rd October 2026, 9AM prompt, RCCG Fruitful Vine, Ikotun, Lagos. Registration is compulsory — ₦1,000, paid via Moniepoint. Register now.">
 <meta name="twitter:image" content="https://lp7mediabootcamp.netlify.app/flyer.jpg">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -301,6 +301,24 @@
     background:var(--tonal); border-radius:var(--r-sm); padding:11px 14px;
     font-size:13px; color:var(--ember-deep); line-height:1.55; font-weight:500;
   }
+  .pay-box{
+    margin-top:10px; background:#fff; border:1.5px dashed var(--ember-strong);
+    border-radius:14px; padding:12px 14px; display:flex; flex-direction:column; gap:2px;
+  }
+  .pay-box .pb-label{font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-soft);}
+  .pay-box .pb-name{font-size:14px; font-weight:600; color:var(--ink);}
+  .pay-box .pb-number{
+    font-size:22px; font-weight:800; letter-spacing:0.02em; color:var(--ember-strong);
+    font-variant-numeric:tabular-nums; margin-top:2px;
+  }
+  .pay-box.dark{background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.35);}
+  .pay-box.dark .pb-label{color:rgba(255,255,255,.6);}
+  .pay-box.dark .pb-name{color:#fff;}
+  .pay-box.dark .pb-number{color:var(--amber);}
+  .t-fee .pay-box{padding:9px 11px; margin-top:8px;}
+  .t-fee .pay-box .pb-label{font-size:10px;}
+  .t-fee .pay-box .pb-name{font-size:12.5px;}
+  .t-fee .pay-box .pb-number{font-size:17px; letter-spacing:0;}
   .btn-row{display:flex; gap:10px; margin-top:6px;}
   .btn{
     border:none; border-radius:999px; padding:13px; font-family:var(--font); font-weight:600;
@@ -510,7 +528,12 @@
       <span class="k">Registration fee</span>
       <div>
         <div class="big">₦1,000</div>
-        <p>Compulsory. Pay at the venue.</p>
+        <p>Compulsory. Pay via Moniepoint, send receipt to your coordinator.</p>
+        <div class="pay-box dark">
+          <span class="pb-label">Moniepoint</span>
+          <span class="pb-name">Sarah John</span>
+          <span class="pb-number">8025699054</span>
+        </div>
       </div>
     </div>
     <div class="tile t-venue">
@@ -561,8 +584,8 @@
       <div class="expect-item">
         <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="3"/><circle cx="12" cy="12" r="2.5"/><path d="M6.5 12h.01M17.5 12h.01"/></svg></div>
         <div>
-          <h3>Registration fee at the venue</h3>
-          <p>Bring your ₦1,000 on the day if you haven't paid ahead.</p>
+          <h3>Registration fee</h3>
+          <p>Pay ₦1,000, then send your receipt to your church coordinator.</p>
         </div>
       </div>
     </div>
@@ -574,7 +597,12 @@
   <div class="cta-inner">
     <div>
       <h2>Registration is compulsory for every attendee.</h2>
-      <p>It takes less than a minute. Save your spot now and pay the ₦1,000 fee at the venue.</p>
+      <p>It takes less than a minute. Save your spot now, pay the ₦1,000 fee, and send your receipt to your church coordinator.</p>
+      <div class="pay-box">
+        <span class="pb-label">Moniepoint</span>
+        <span class="pb-name">Sarah John</span>
+        <span class="pb-number">8025699054</span>
+      </div>
     </div>
     <button type="button" class="btn-pill btn-white" onclick="openModal()">
       Register now
@@ -627,7 +655,14 @@
             <div class="field-counter" id="expectCounter">0 / 280 characters</div>
             <div class="field-error" id="expectError">Please write a real sentence, not one long word or repeated characters.</div>
           </div>
-          <div class="fee-note">Registration is compulsory. The ₦1,000 fee is payable at the venue on the day.</div>
+          <div class="fee-note">
+            Registration is compulsory. Pay the ₦1,000 fee and send your receipt to your church coordinator.
+            <div class="pay-box">
+              <span class="pb-label">Moniepoint</span>
+              <span class="pb-name">Sarah John</span>
+              <span class="pb-number">8025699054</span>
+            </div>
+          </div>
           <div class="field-error" id="submitError">Something went wrong. Please try again.</div>
           <div class="btn-row">
             <button type="submit" class="btn btn-primary" id="submitBtn">
@@ -656,7 +691,12 @@
           <div class="t-row"><span class="l">Date</span><span class="v">Saturday 3 October 2026</span></div>
           <div class="t-row"><span class="l">Time</span><span class="v">9:00 AM prompt</span></div>
           <div class="t-row"><span class="l">Venue</span><span class="v">RCCG Fruitful Vine<small>6&ndash;7 Ishmaila Ajibade, Nobex, Ikotun, Lagos</small></span></div>
-          <div class="t-row"><span class="l">Bring</span><span class="v">&#8358;1,000 registration fee<small>Paid at the venue</small></span></div>
+          <div class="t-row"><span class="l">Bring</span><span class="v">&#8358;1,000 registration fee<small>Send receipt to your coordinator after paying.</small></span></div>
+        </div>
+        <div class="pay-box" style="margin:12px 0 0;">
+          <span class="pb-label">Moniepoint</span>
+          <span class="pb-name">Sarah John</span>
+          <span class="pb-number">8025699054</span>
         </div>
         <p class="s-note">A confirmation email is on its way to your Gmail. If you don't see it, check your spam folder.</p>
         <div class="s-actions">
