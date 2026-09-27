@@ -49,8 +49,9 @@ exports.handler = async function (event) {
   if (!fullName || fullName.length < 3) {
     return { statusCode: 400, body: JSON.stringify({ error: 'Please enter a valid full name.' }) };
   }
-  if (!GMAIL_PATTERN.test(email)) {
-    return { statusCode: 400, body: JSON.stringify({ error: 'Please enter a valid Gmail address.' }) };
+  // Email is optional now — only validate the format if the person actually gave one.
+  if (email !== '' && !GMAIL_PATTERN.test(email)) {
+    return { statusCode: 400, body: JSON.stringify({ error: 'Please enter a valid Gmail address, or leave email blank.' }) };
   }
   if (!zone) {
     return { statusCode: 400, body: JSON.stringify({ error: 'Please enter your parish.' }) };
@@ -84,9 +85,10 @@ exports.handler = async function (event) {
     return { statusCode: 500, body: JSON.stringify({ error: 'Could not save your registration. Please try again.' }) };
   }
 
-  // Send the confirmation email immediately — this failing should not undo the registration above
+  // Send the confirmation email immediately — this failing should not undo the registration above.
+  // Skipped entirely when no email was given, since email is now optional.
   let emailSent = false;
-  {
+  if (email !== '') {
     try {
       const res = await fetch('https://api.brevo.com/v3/smtp/email', {
         method: 'POST',
