@@ -65,17 +65,8 @@ exports.handler = async function (event) {
   const fbAdmin = getAdmin();
   const db = getDb(fbAdmin);
 
-  // Hard duplicate check — this is the real gate; the client-side check-email call
-  // is just there to warn people earlier, but this is what actually prevents it.
-  try {
-    const existing = await db.collection('registrations').where('email', '==', email).limit(1).get();
-    if (!existing.empty) {
-      return { statusCode: 409, body: JSON.stringify({ error: 'This email has already registered for PYLR 2026.' }) };
-    }
-  } catch (err) {
-    console.error('Duplicate check failed:', err);
-    return { statusCode: 500, body: JSON.stringify({ error: 'Could not verify your registration. Please try again.' }) };
-  }
+  // Duplicate emails are allowed — every submission is treated as a brand new
+  // registration, even if that email has registered before.
 
   // Save the registration first — if the email fails afterwards, the registrant still isn't lost
   let docRef;
