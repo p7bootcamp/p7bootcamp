@@ -296,6 +296,7 @@
   .row2{display:flex; gap:14px;}
   .row2 .field{flex:1;}
   .required-star{color:var(--ember-strong);}
+  .optional-tag{color:var(--muted, #8a8a8a); font-weight:400; font-size:0.85em;}
 
   .fee-note{
     background:var(--tonal); border-radius:var(--r-sm); padding:11px 14px;
@@ -632,9 +633,9 @@
             <div class="field-error" id="fullNameError">Name must be at least three characters.</div>
           </div>
           <div class="field">
-            <label>Email address <span class="required-star">*</span></label>
-            <input type="email" id="email" required maxlength="100" pattern="[A-Za-z0-9._%+\-]+@gmail\.com" title="Please enter a valid Gmail address (e.g. name@gmail.com)" placeholder="yourname@gmail.com">
-            <div class="field-hint">We only accept Gmail addresses (e.g. name@gmail.com)</div>
+            <label>Email address <span class="optional-tag">(optional)</span></label>
+            <input type="email" id="email" maxlength="100" pattern="[A-Za-z0-9._%+\-]+@gmail\.com" title="Please enter a valid Gmail address (e.g. name@gmail.com)" placeholder="yourname@gmail.com">
+            <div class="field-hint">Don't have an email? No problem — you can still register.</div>
             <div class="field-error" id="emailError">That doesn't look like a valid Gmail address.</div>
           </div>
           <div class="row2">
@@ -698,7 +699,7 @@
           <span class="pb-name">Sarah John</span>
           <span class="pb-number">8025699054</span>
         </div>
-        <p class="s-note">A confirmation email is on its way to your Gmail. If you don't see it, check your spam folder.</p>
+        <p class="s-note" id="successNote">A confirmation email is on its way to your Gmail. If you don't see it, check your spam folder.</p>
         <div class="s-actions">
           <a class="btn-pill btn-fill" href="https://www.google.com/maps/search/?api=1&amp;query=RCCG+Fruitful+Vine+Ishmaila+Ajibade+Ikotun+Lagos" target="_blank" rel="noopener">Get directions</a>
           <button type="button" class="btn-pill btn-tonal" onclick="closeModal()">Done</button>
@@ -785,22 +786,26 @@
 
   const fieldIds = ['fullName', 'email', 'zone', 'age'];
   const NO_BLUR_ERROR = ['fullName'];
+  const OPTIONAL_FIELDS = ['email'];
 
   fieldIds.forEach(function(id){
     const field = document.getElementById(id);
     const errorEl = document.getElementById(id + 'Error');
     const defaultErrorText = errorEl ? errorEl.textContent : '';
     const noBlurError = NO_BLUR_ERROR.includes(id);
+    const isOptional = OPTIONAL_FIELDS.includes(id);
     function validateField(showError){
-      const ok = field.checkValidity() && field.value.trim() !== '';
+      const isEmpty = field.value.trim() === '';
+      const ok = isOptional && isEmpty ? true : (field.checkValidity() && !isEmpty);
       field.classList.toggle('invalid', !ok && showError);
-      field.classList.toggle('valid', ok && field.value.trim() !== '');
+      field.classList.toggle('valid', ok && !isEmpty);
       if (errorEl) errorEl.classList.toggle('show', !ok && showError);
       return ok;
     }
     field.addEventListener('input', function(){
       if (errorEl) errorEl.textContent = defaultErrorText;
-      const ok = field.checkValidity() && field.value.trim() !== '';
+      const isEmpty = field.value.trim() === '';
+      const ok = isOptional && isEmpty ? true : (field.checkValidity() && !isEmpty);
       if (ok) validateField(false);
       else { field.classList.remove('invalid'); if (errorEl) errorEl.classList.remove('show'); }
     });
@@ -810,6 +815,11 @@
       if (errorEl) errorEl.classList.remove('show');
     });
     field.addEventListener('blur', function(){
+      // Strip stray leading/trailing spaces so a trailing space typed by
+      // habit never silently breaks pattern validation (e.g. name/parish
+      // patterns require the value to end on a real character).
+      const trimmedVal = field.value.trim();
+      if (trimmedVal !== field.value) field.value = trimmedVal;
       if (noBlurError){
         if (field.checkValidity() && field.value.trim() !== '') validateField(false);
         return;
@@ -826,6 +836,11 @@
     let firstInvalid = null;
     fieldIds.forEach(function(id){
       const field = document.getElementById(id);
+      // Trim any stray trailing/leading space before validating — this is
+      // what causes a value like "Ayomide Johnson " to fail pattern checks
+      // that require the field to end on a real character.
+      const trimmedVal = field.value.trim();
+      if (trimmedVal !== field.value) field.value = trimmedVal;
       const ok = field._validate(true);
       if (!ok && !firstInvalid) firstInvalid = field;
       if (!ok) allValid = false;
@@ -859,27 +874,28 @@
     };
 
     submitBtn.disabled = true;
-    submitBtnText.textContent = 'Checking…';
 
-    try {
-      const checkRes = await fetch('/.netlify/functions/check-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: payload.email }),
-      });
-      const checkResult = await checkRes.json();
-      if (checkResult.registered){
-        emailField.focus();
-        emailField.classList.add('invalid');
-        emailErrorEl.textContent = 'This email has already registered for PYLR 2026.';
-        emailErrorEl.classList.add('show');
-        submitBtn.disabled = false;
-        submitBtnText.textContent = 'Register';
-        return;
+    if (payload.email !== ''){
+      submitBtnText.textContent = 'Checking…';
+      try {
+        const checkRes = await fetch('/.netlify/functions/check-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: payload.email }),
+        });
+        const checkResult = await checkRes.json();
+        if (checkResult.registered){
+          emailField.focus();
+          emailField.classList.add('invalid');
+          emailErrorEl.textContent = 'This email has already registered for PYLR 2026.';
+          emailErrorEl.classList.add('show');
+          submitBtn.disabled = false;
+          submitBtnText.textContent = 'Register';
+          return;
+        }
+      } catch (err) {
+        // If the check itself fails (network hiccup), don't block a legitimate registrant.
       }
-    } catch (err) {
-      // If the check itself fails (network hiccup), don't block a legitimate registrant —
-      // register.js still enforces the real duplicate check below.
     }
 
     submitBtnText.textContent = 'Submitting…';
@@ -898,6 +914,9 @@
 
       const name = payload.fullName.split(' ')[0] || 'friend';
       document.getElementById('successName').textContent = name;
+      document.getElementById('successNote').textContent = payload.email !== ''
+        ? "A confirmation email is on its way to your Gmail. If you don't see it, check your spam folder."
+        : 'Please hold on to this ticket \u2014 you didn\u2019t provide an email, so we can\u2019t send a confirmation.';
       document.getElementById('formPanel').style.display = 'none';
       document.querySelector('#registerModal .card-top').style.display = 'none';
       document.querySelector('#registerModal .card').classList.add('done');
